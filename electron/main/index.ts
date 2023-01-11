@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
@@ -41,8 +41,17 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 async function createWindow() {
+
+  const screenSize = screen.getPrimaryDisplay().size;
+  const width = 1000, height = 800;
   win = new BrowserWindow({
-    title: 'Main window',
+    title: 'Share App',
+    width,
+    height,
+    fullscreenable: false,
+    x: (screenSize.width -  width),
+    y: (screenSize.height - height),
+    resizable: false,
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
