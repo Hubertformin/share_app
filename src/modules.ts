@@ -6,12 +6,19 @@ import "bottom-navigation-vue/dist/style.css";
 import router from './router'
 import {OhVueIcon} from "oh-vue-icons";
 import registerIcons from "./icons";
+import store from "./store";
+import Store from 'electron-store';
 
 
 export function registerModules(app: any) {
     registerIcons();
+    app.use(store);
     app.use(Antd);
     app.use(router);
     app.component("v-icon", OhVueIcon);
-    app.use(bottomNavigationVue)
+    app.use(bottomNavigationVue);
+    /**
+     * GLOBAL VARIABLES
+     */
+    app.config.globalProperties.$settings = new Store();
 }

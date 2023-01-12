@@ -1,17 +1,17 @@
-import { app, BrowserWindow, shell, ipcMain, screen } from 'electron'
-import { release } from 'node:os'
-import { join } from 'node:path'
+import {app, BrowserWindow, ipcMain, screen, shell, DownloadItem} from 'electron'
+import {release} from 'node:os'
+import {join} from 'node:path';
+import * as remoteMain from '@electron/remote/main';
+import {initApp} from "./modules/init";
+import {AppServer} from "./modules/Server";
+import {getHostIp} from "./utils/utility";
+import {download} from 'electron-dl';
+import Store from "electron-store";
+import {ConfigModel, FileModel} from "../models";
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
+const settings = new Store();
+
+remoteMain.initialize();
 process.env.DIST_ELECTRON = join(__dirname, '..')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
 process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -55,13 +55,12 @@ async function createWindow() {
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
       contextIsolation: false,
     },
   })
+
+  remoteMain.enable(win.webContents);
 
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
     win.loadURL(url)
@@ -122,4 +121,99 @@ ipcMain.handle('open-win', (_, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
+})
+
+
+initApp()
+    .catch(console.error)
+
+// Init server
+const appServer = new AppServer();
+appServer.startServer();
+
+ipcMain.handle('get-ip', async (_, arg) => {
+  return getHostIp();
+})
+
+ipcMain.handle('find-rooms', async (_, arg) => {
+  return await appServer.shareRoom.findRooms();
+})
+
+ipcMain.handle('create-room', async (_, arg) => {
+  const {name} = JSON.parse(arg);
+
+  return await appServer.shareRoom.createRoom(name);
+});
+
+interface FileDownload extends FileModel {
+  downloadItemHandler: DownloadItem;
+  url: string;
+}
+let filesInDownload: FileDownload[] = [];
+ipcMain.on('download-file', async (event, arg) => {
+  const file = JSON.parse(arg) as FileDownload;
+  // Get config
+  const config: ConfigModel = settings.get('config') as ConfigModel;
+  await download(win, file.url, {
+    directory: config.destinationDir,
+    openFolderWhenDone: false,
+    overwrite: true,
+    saveAs: false,
+    onStarted: (item) => {
+      file.downloadItemHandler = item;
+      filesInDownload.push(file);
+      win.webContents.send('file-download-started', JSON.stringify({
+        fileId: file.id,
+        canResume: item.canResume()
+      }));
+    },
+    onProgress(progress) {
+      win.webContents.send('file-download-progress', JSON.stringify({
+        fileId: file.id,
+        ...progress
+      }))
+    },
+    onTotalProgress(progress) {
+      win.webContents.send('total-download-progress', JSON.stringify({
+        fileId: file.id,
+        ...progress
+      }))
+    },
+    onCompleted(data) {
+      win.webContents.send('file-download-complete', JSON.stringify({
+        fileId: file.id,
+        path: data.path
+      }))
+    },
+    onCancel(_) {
+      win.webContents.send('file-download-canceled', JSON.stringify({
+        fileId: file.id,
+      }))
+    },
+  });
+});
+
+ipcMain.on('cancel-download', async (event, arg) => {
+  const _file = JSON.parse(arg) as FileModel;
+  const file = filesInDownload.find(f => f.id === _file.id);
+  if (file) {
+    file.downloadItemHandler.cancel();
+  }
+});
+
+ipcMain.on('open-file', async (event, path) => {
+  shell.openPath(path)
+  shell.beep()
+});
+
+ipcMain.on('open-destination-folder', async (event, path) => {
+  const config: ConfigModel = settings.get('config') as ConfigModel;
+  shell.openPath(config.destinationDir)
+});
+
+
+
+
+app.on('quit', () => {
+  appServer.stopServer();
 })

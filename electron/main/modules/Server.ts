@@ -1,0 +1,159 @@
+import express, {Application} from "express";
+import cors from 'cors';
+import { createServer, Server } from "http";
+import {Server as SocketServer, Socket} from "socket.io";
+import CONSTANTS from "../utils/constants";
+import {DefaultEventsMap} from "socket.io/dist/typed-events";
+import {ShareRoom} from "./ShareRoom";
+import * as bodyParser from "body-parser";
+import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
+import {generateUID} from "../utils/utility";
+import {DeviceModel} from "../../models";
+import {createReadStream} from 'fs';
+import {basename} from 'path'
+
+export class AppServer {
+    private readonly _expressApp: Application;
+    private readonly _httpServer: Server;
+    private io: SocketServer<DefaultEventsMap>;
+
+    private _shareRoom: ShareRoom
+    constructor() {
+        this._expressApp = express();
+        this._expressApp.use(cors());
+        this._expressApp.use(bodyParser.urlencoded({ extended: false }));
+        this._httpServer = createServer(this._expressApp);
+        this.io = new SocketServer(this._httpServer, {
+            httpCompression: true,
+            cors: {
+                origin: "*",
+                methods: ["GET", "POST", "PUT"],
+                // allowedHeaders: ["Access-Allow-Origin"],
+                credentials: true
+            }
+        });
+        this._shareRoom = new ShareRoom();
+        this.initRoutes();
+        this.initConnectionListener();
+    }
+
+    get HttpServer(): Server {
+        return this._httpServer;
+    }
+
+    get shareRoom(): ShareRoom {
+        return this._shareRoom;
+    }
+
+    startServer() {
+        this._httpServer.listen(CONSTANTS.PUBLIC_PORT)
+    }
+
+    private initConnectionListener() {
+        // middle to authenticate user
+        this.io.use((socket, next) => {
+            try {
+                if (!this._shareRoom.isRoomActive) {
+                    next(new Error("NO_ACTIVE_ROOM"));
+                    return;
+                }
+                // If passcode is correct
+                if (socket.handshake.auth && socket.handshake.auth.passcode) {
+                    if (socket.handshake.auth.passcode.toString() !=  this.shareRoom.room.passcode) {
+                        next(new Error('AUTH_ERROR'));
+                        return;
+                    }
+                    next();
+                }
+                else {
+                    next(new Error('ACCESS_DENIED'));
+                }
+            } catch (e) {
+                console.log(e);
+                next(new Error('ERROR_OCCURRED'));
+            }
+        }).on("connection", (socket) => {
+            const device = JSON.parse(socket.handshake.query.device as string) as DeviceModel;
+            // set the joining date...
+            device.joinedOn = (new Date().toISOString());
+            /**
+             * If user is already in room, don't add.
+             * It is possible that the person was disconnected from the socket and is still in
+             * the participants array..
+             */
+            if (!this._shareRoom.room.participants.find(p => p.id == device.id)) {
+                // add person to devices list
+                this._shareRoom.addToRoom(device);
+                // emit person added event
+                socket.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+            }
+            // Add connection room
+            socket.join(this._shareRoom.room.name)
+            // Start room events for files, devices etc
+            this.initRoomListeners(socket);
+            // on disconnection
+            socket.on("disconnect", (reason) => {
+               this._shareRoom.removeParticipant(device.id);
+                socket.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+            });
+        })
+    }
+
+    initRoutes() {
+        // get Share room info
+        this._expressApp.use((req, res, next) => {
+            if (!this._shareRoom.isRoomActive) {
+                return res.status(405).json({code: 'NO_ACTIVE_ROOM'})
+            }
+            next();
+        });
+        this._expressApp.get('/share-room', (req, res) => {
+            if (!this._shareRoom.isRoomActive) {
+                return res.status(405).json({code: 'NO_ACTIVE_ROOM'})
+            }
+
+            res.status(200).json({data: this._shareRoom.room, message: 'Room fetched'})
+        });
+        // Download file
+        this._expressApp.get('/download/', async (req, res, next) => {
+            const { path, type } = req.query;
+            try {
+                // const fileName = basename(path.toString())
+                // const stream = createReadStream(path.toString());
+                // const disposition = 'attachment; filename="' + fileName + '"';
+                //
+                // res.attachment(fileName)
+                // res.setHeader('Content-Type', type.toString());
+                // res.setHeader('Content-Disposition', disposition);
+                //
+                // stream.pipe(res);
+                res.download(path.toString())
+            } catch(err) {
+                res.sendStatus(500);
+            }
+        });
+
+    }
+
+    initRoomListeners(socket: Socket) {
+        // when a file is added to room
+        socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (data) => {
+            // Add Ids and shared Date to files
+            let files = JSON.parse(data).files.map(file => {
+                return {
+                    id: generateUID('doc', (this._shareRoom.room.files.length + 1).toString()),
+                    sharedDate: (new Date()).toISOString(),
+                    ...file
+                }
+            });
+            // Add files to room data
+            this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
+
+            socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
+        })
+    }
+
+    stopServer() {
+        this._httpServer.close();
+    }
+}

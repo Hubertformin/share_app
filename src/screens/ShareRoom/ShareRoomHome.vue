@@ -1,9 +1,15 @@
 <script lang="ts">
 import { SwipeBottomNavigation } from "bottom-navigation-vue";
+import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
+import {fetchMain} from "../../utils/ipc-render";
+import {io, Socket} from "socket.io-client";
+import {mapMutations} from "vuex";
+import {DeviceModel, DOWNLOAD_STATE} from "../../models";
 export default {
   components: { SwipeBottomNavigation },
   data: () => ({
     selected: 1,
+    $socket: {},
     options: [
       {
         id: 1,
@@ -29,6 +35,56 @@ export default {
       },
     ]
   }),
+  mounted() {
+    /**
+     * A;; listener functions should be init here
+     */
+    fetchMain('create-room', {name: "Hub's room"})
+        .then(async (data: any) => {
+          console.log(data)
+          const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
+          // Connect to socket
+          const socket = io('ws://127.0.0.1:2391', {
+            auth: {
+              passcode: data.passcode
+            },
+            query: {
+              device: JSON.stringify(deviceInfo)
+            }
+          });
+          // update socket var in state
+          this.setSocket(socket);
+
+          this.initListeners(socket);
+        })
+        .catch(console.error);
+  },
+  methods: {
+    ...mapMutations(['setSocket', 'addFilesToRoom', 'addDevicesToRoom']),
+    initListeners(socket: Socket) {
+      // Listen to files in the room
+      socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files) => {
+        // Add download meta data
+        files = files.map((file: any) => {
+          file['downloadMeta'] = {
+            state: DOWNLOAD_STATE.NOT_DOWNLOADED,
+            totalBytes: 0,
+            path: '',
+            percent: 0,
+            transferredBytes: 0
+          }
+          return file;
+        });
+        //Add to state...
+        this.addFilesToRoom(files);
+      });
+      // Listen to devices in room
+      socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices) => {
+        // Add to state...
+        this.addDevicesToRoom(JSON.parse(devices));
+      })
+    },
+  }
 };
 </script>
 
@@ -47,7 +103,7 @@ export default {
     </div>
     <div class="trail flex gap-4">
       <a-button danger type="primary" shape="circle">
-        <template #icon><v-icon name="io-power-outline" fill="white" /></template>
+        <template #icon><v-icon name="bi-power" fill="white" /></template>
       </a-button>
       <a-button ghost shape="circle">
         <template #icon><v-icon name="co-settings" fill="blue" /></template>

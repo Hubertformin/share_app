@@ -6,10 +6,18 @@ import {
     HiViewGridAdd,
     BiUiChecksGrid,
     MdSettingsinputantennaOutlined,
-    IoPowerOutline,
     CoSettings,
     GiFiles,
-    BiPlusSquareDotted
+    BiPlusSquareDotted,
+    BiDownload,
+    BiApple,
+    IoLogoWindows,
+    CoLinux,
+    BiPower,
+    FaLinux,
+    PrAndroid,
+    MdDeviceunknown,
+    PrPause, BiStopFill
 } from "oh-vue-icons/icons";
 
 export default function registerIcons() {
@@ -20,9 +28,18 @@ export default function registerIcons() {
         BiPeople,
         HiViewGridAdd,
         BiUiChecksGrid,
-        IoPowerOutline,
+        BiPower,
         CoSettings,
         GiFiles,
-        BiPlusSquareDotted
+        BiPlusSquareDotted,
+        BiDownload,
+        BiApple,
+        IoLogoWindows,
+        CoLinux,
+        FaLinux,
+        PrAndroid,
+        MdDeviceunknown,
+        PrPause,
+        BiStopFill
     );
 }
