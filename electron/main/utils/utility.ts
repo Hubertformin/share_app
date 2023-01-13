@@ -51,6 +51,6 @@ export function getHostIp(): string {
             }
         }
     }
-
-    return results["en0"][0];
+    const key = Object.keys(results)[0];
+    return results[key][0];
 }

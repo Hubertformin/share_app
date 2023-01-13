@@ -1,3 +1,38 @@
+<template>
+  <div id="header" class="flex px-6 items-center justify-between">
+    <div class="lead">
+      <div class="room flex gap-2 items-center">
+        <div class="icon">
+          <v-icon name="md-settingsinputantenna-outlined" scale="2.2" fill="white" />
+        </div>
+        <div class="tile">
+          <h2 class="text-lg text-white font-semibold mb-0">Hubert's ShareRoom</h2>
+          <p class="text-gray-300 mb-0">Passcode: AX67P4</p>
+        </div>
+      </div>
+    </div>
+    <div class="trail flex gap-4">
+      <a-button danger type="primary" shape="circle">
+        <template #icon><v-icon name="bi-power" fill="white" /></template>
+      </a-button>
+      <a-button ghost shape="circle">
+        <template #icon><v-icon name="co-settings" fill="blue" /></template>
+      </a-button>
+    </div>
+  </div>
+  <div id="page_view">
+    <router-view></router-view>
+  </div>
+  <SwipeBottomNavigation
+      swiper-color='#00488d'
+      title-color="#00488d"
+      icon-color="#00488d"
+      :options="options"
+      v-model="selected">
+    <template #icon="{ props }"><v-icon :name="props.icon" /></template>
+  </SwipeBottomNavigation>
+</template>
+
 <script lang="ts">
 // @ts-ignore
 import { SwipeBottomNavigation } from "bottom-navigation-vue";
@@ -72,41 +107,6 @@ export default defineComponent({
   }
 });
 </script>
-
-<template>
-  <div id="header" class="flex px-6 items-center justify-between">
-    <div class="lead">
-      <div class="room flex gap-2 items-center">
-        <div class="icon">
-          <v-icon name="md-settingsinputantenna-outlined" scale="2.2" fill="white" />
-        </div>
-        <div class="tile">
-          <h2 class="text-lg text-white font-semibold mb-0">Hubert's ShareRoom</h2>
-          <p class="text-gray-300 mb-0">Passcode: AX67P4</p>
-        </div>
-      </div>
-    </div>
-    <div class="trail flex gap-4">
-      <a-button danger type="primary" shape="circle">
-        <template #icon><v-icon name="bi-power" fill="white" /></template>
-      </a-button>
-      <a-button ghost shape="circle">
-        <template #icon><v-icon name="co-settings" fill="blue" /></template>
-      </a-button>
-    </div>
-  </div>
-  <div id="page_view">
-    <router-view></router-view>
-  </div>
-  <SwipeBottomNavigation
-      swiper-color='#00488d'
-      title-color="#00488d"
-      icon-color="#00488d"
-      :options="options"
-      v-model="selected">
-    <template #icon="{ props }"><v-icon :name="props.icon" /></template>
-  </SwipeBottomNavigation>
-</template>
 
 <style scoped lang="scss">
   $header-height: 75px;
