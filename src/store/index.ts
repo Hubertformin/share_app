@@ -30,6 +30,9 @@ const store = createStore({
         }
     },
     mutations: {
+        setActiveShareRoom(state, payload) {
+            state.activeShareRoom = payload
+        },
         addFilesToRoom(state, payload: FileModel[]) {
             state.roomFiles.unshift(...payload)
         },

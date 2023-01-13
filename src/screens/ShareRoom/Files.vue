@@ -46,7 +46,7 @@
 <script lang="ts">
 import {getFileIconClass} from "../../utils/file-icon";
 import {mapState} from "vuex";
-import {DOWNLOAD_STATE} from "../../models";
+import {DOWNLOAD_STATE, FileModel} from "../../models";
 import {readableFileSize} from "../../utils/strings";
 import {sendMain} from "../../utils/ipc-render";
 
@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     ...mapState({
-       files: (state: any) => state.roomFiles.filter(f => f.downloadMeta?.state === DOWNLOAD_STATE.DOWNLOAD_COMPLETE)
+       files: (state: any) => state.roomFiles.filter((f: FileModel) => f.downloadMeta?.state === DOWNLOAD_STATE.DOWNLOAD_COMPLETE)
     })
   },
   methods: {

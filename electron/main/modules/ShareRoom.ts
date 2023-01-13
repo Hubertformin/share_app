@@ -43,7 +43,7 @@ export class ShareRoom {
         return rooms;
     }
 
-    async createRoom(name: string): Promise<ShareRoomModel> {
+    async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {
         // If rome already exist, return room
         if (this.isRoomActive) return this._room;
         // else create new room
@@ -54,7 +54,7 @@ export class ShareRoom {
             name,
             files: [],
             hostIp: getHostIp(),
-            maxParticipants: config.maxParticipants,
+            maxParticipants: maxParticipants || config.maxParticipants,
             deviceId: deviceInfo.id,
             passcode: generateShortPasscode(),
             participants: []

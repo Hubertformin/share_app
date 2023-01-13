@@ -46,19 +46,20 @@ export default {
   },
   methods: {
     openFilePicker() {
+      // @ts-ignore
       this.$refs.file.click();
     },
-    onChange(e) {
+    onChange(e: any) {
       this.addFilesToRoom(e.target.files)
     },
-    dragover(e) {
+    dragover(e: any) {
       e.preventDefault();
       this.isDragging = true;
     },
     dragleave() {
       this.isDragging = false;
     },
-    drop(e) {
+    drop(e: any) {
       e.preventDefault();
 
       this.isDragging = false;

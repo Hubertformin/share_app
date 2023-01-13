@@ -1,10 +1,10 @@
 <script lang="ts">
+// @ts-ignore
 import { SwipeBottomNavigation } from "bottom-navigation-vue";
 import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
-import {fetchMain} from "../../utils/ipc-render";
 import {io, Socket} from "socket.io-client";
-import {mapMutations} from "vuex";
-import {DeviceModel, DOWNLOAD_STATE} from "../../models";
+import {mapMutations, mapState} from "vuex";
+import {DOWNLOAD_STATE} from "../../models";
 export default {
   components: { SwipeBottomNavigation },
   data: () => ({
@@ -39,31 +39,16 @@ export default {
     /**
      * A;; listener functions should be init here
      */
-    fetchMain('create-room', {name: "Hub's room"})
-        .then(async (data: any) => {
-          console.log(data)
-          const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
-          // Connect to socket
-          const socket = io('ws://127.0.0.1:2391', {
-            auth: {
-              passcode: data.passcode
-            },
-            query: {
-              device: JSON.stringify(deviceInfo)
-            }
-          });
-          // update socket var in state
-          this.setSocket(socket);
-
-          this.initListeners(socket);
-        })
-        .catch(console.error);
+    this.initListeners()
+  },
+  computed: {
+    ...mapState(['socket'])
   },
   methods: {
     ...mapMutations(['setSocket', 'addFilesToRoom', 'addDevicesToRoom']),
-    initListeners(socket: Socket) {
+    initListeners() {
       // Listen to files in the room
-      socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files) => {
+      this.socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files:  any[]) => {
         // Add download meta data
         files = files.map((file: any) => {
           file['downloadMeta'] = {
@@ -79,7 +64,7 @@ export default {
         this.addFilesToRoom(files);
       });
       // Listen to devices in room
-      socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices) => {
+      this.socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices: string) => {
         // Add to state...
         this.addDevicesToRoom(JSON.parse(devices));
       })

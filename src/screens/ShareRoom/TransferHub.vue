@@ -51,14 +51,14 @@ export default {
     ...mapState(['roomFiles', 'socket'])
   },
   methods: {
-    dragover(e) {
+    dragover(e: any) {
       e.preventDefault();
       this.isDragging = true;
     },
     dragleave() {
       this.isDragging = false;
     },
-    drop(e) {
+    drop(e: any) {
       e.preventDefault();
 
       this.isDragging = false;

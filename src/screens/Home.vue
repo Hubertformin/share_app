@@ -2,7 +2,7 @@
   <div class="h-screen flex flex-col justify-center items-center">
     <h2 class="text-2xl">ShareRoom</h2>
     <div class="actions flex gap-4">
-      <a-button type="primary" shape="round" size="large" @click="modal2Visible = true">
+      <a-button type="primary" shape="round" size="large" @click="modalVisible = true">
         <template #icon>
           <v-icon name="hi-view-grid-add" />
         </template>
@@ -18,14 +18,33 @@
     </div>
 
     <a-modal
-        v-model:visible="modal2Visible"
-        title="Vertically centered modal dialog"
+        v-model:visible="modalVisible"
+        title="Create ShareRoom"
+        width="500px"
         centered
-        @ok="modal2Visible = false"
     >
-      <p>some contents...</p>
-      <p>some contents...</p>
-      <p>some contents...</p>
+      <a-form ref="formRef" :model="formState" name="room_form" layout="vertical">
+        <a-form-item
+            label="ShareRoom name"
+            name="name"
+            :rules="[{ required: true, message: 'Please specify a ShareRoom name' }]"
+        >
+          <a-input placeholder="Enter room name" v-model:value="formState.name" />
+        </a-form-item>
+
+        <a-form-item
+            label="Maximun number of participants"
+            name="maxParticipants"
+            :rules="[{ required: formState.name, message: 'Please specify the maximum connections' }]"
+        >
+          <a-input v-model:value="formState.maxParticipants" />
+        </a-form-item>
+      </a-form>
+
+      <template #footer>
+        <a-button @click="modalVisible = false">Close</a-button>
+        <a-button type="primary" :loading="loading" @click="createRoom">Create</a-button>
+      </template>
     </a-modal>
   </div>
 </template>
@@ -35,24 +54,49 @@
 </style>
 
 <script lang="ts">
-import {ref} from "vue";
+import {reactive, ref, watch} from "vue";
+import {FormInstance} from "ant-design-vue";
+import {fetchMain} from "../utils/ipc-render";
+import {DeviceModel} from "../models";
+import {io} from "socket.io-client";
+import {mapMutations} from "vuex";
+
+interface FormState {
+  name: string;
+  maxParticipants: number
+}
 
 export default {
   setup() {
-    const modal1Visible = ref<boolean>(false);
-    const modal2Visible = ref<boolean>(false);
+    const modalVisible = ref<boolean>(false);
 
-    const setModal1Visible = (visible: boolean) => {
-      modal1Visible.value = visible;
+    const setModalVisible = (visible: boolean) => {
+      modalVisible.value = visible;
     };
+
+    const formRef = ref<FormInstance>();
+    const formState = reactive<FormState>({
+      name: '',
+      maxParticipants: 20
+    });
+    watch(
+        () => formState.name,
+        () => {
+          formRef?.value?.validateFields(['name']);
+        },
+        { flush: 'post' },
+    );
+
     return {
-      modal1Visible,
-      modal2Visible,
-      setModal1Visible,
+      modalVisible,
+      setModalVisible,
+      formState,
+      formRef,
     };
   },
   data() {
     return {
+      loading: false
     }
   },
   mounted() {
@@ -62,6 +106,39 @@ export default {
   computed: {
   },
   methods: {
+    ...mapMutations(['setSocket', 'setActiveShareRoom']),
+    async createRoom() {
+      try {
+        // @ts-ignore
+        await this.formRef.validateFields();
+        this.loading = true;
+        fetchMain('create-room', this.formState)
+            .then(async (data: any) => {
+              console.log(data)
+              this.setActiveShareRoom(data);
+
+              const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
+              // Connect to socket
+              const socket = io('ws://127.0.0.1:2391', {
+                auth: {
+                  passcode: data.passcode
+                },
+                query: {
+                  device: JSON.stringify(deviceInfo)
+                }
+              });
+              // update socket var in state
+              this.setSocket(socket);
+              // Route to room scanner
+              this.$router.push('/room-radar');
+
+            })
+            .catch(console.error)
+        .finally(() => (this.loading = false))
+      } catch (e) {
+        console.error(e)
+      }
+    }
   },
 }
 </script>
