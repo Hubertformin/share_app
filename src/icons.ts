@@ -17,7 +17,9 @@ import {
     FaLinux,
     PrAndroid,
     MdDeviceunknown,
-    PrPause, BiStopFill
+    PrPause, BiStopFill,
+    MdPeopleSharp,
+    MdFilecopy, PrRefresh
 } from "oh-vue-icons/icons";
 
 export default function registerIcons() {
@@ -40,6 +42,9 @@ export default function registerIcons() {
         PrAndroid,
         MdDeviceunknown,
         PrPause,
-        BiStopFill
+        BiStopFill,
+        MdPeopleSharp,
+        MdFilecopy,
+        PrRefresh
     );
 }

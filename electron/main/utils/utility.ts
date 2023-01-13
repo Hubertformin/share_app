@@ -54,3 +54,22 @@ export function getHostIp(): string {
     const key = Object.keys(results)[0];
     return results[key][0];
 }
+
+export function generateRandomColor(): string {
+    const COLORS = [
+        "#BA000D",
+        "#006978",
+        "#E1980C",
+        "#005B9F",
+        "#673AB7",
+        "#A00037",
+        "#00766C",
+        "#00600F",
+        "#BC5100",
+        "#283593",
+        "#C41C00",
+        "#29434e",
+    ];
+    const randomIndex = Math.floor(Math.random() * COLORS.length);
+    return COLORS[randomIndex];
+}

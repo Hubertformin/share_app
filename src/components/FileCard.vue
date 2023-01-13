@@ -1,8 +1,8 @@
 <template>
-  <div class="px-2 border-b pb-6 border-gray-200 mt-2 mb-6">
-    <div class="flex items-center gap-2 mb-1">
-      <h2 class="device-name font-bold text-teal-900 mb-0">{{file.device.name}}</h2>
-      <p class="mb-0 font-medium text-slate-500 text-sm">{{timeAgo(file.sharedDate)}}</p>
+  <div class="px-2 mt-2">
+    <div class="flex items-center gap-2 mb-2">
+      <h2 class="device-name font-bold mb-0">{{file.device.name}}</h2>
+      <p class="mb-0 font-medium text-slate-400 text-sm">{{timeAgo(file.sharedDate)}}</p>
     </div>
     <div class="file-box cursor-p ml-2 rounded-lg px-4 flex items-center justify-between">
       <div class="leading flex gap-2.5">
@@ -10,10 +10,10 @@
         <div class="meta flex flex-col justify-center">
           <p class="file_name mb-0 font-bold">{{file.name}}</p>
           <div class="flex gap-2.5 items-center">
-            <p v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING" class="text-slate-500 mb-0 font-medium text-sm">
+            <p v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING" class="file_size_downloading text-slate-400 mb-0">
               {{readableFileSize(file.downloadMeta.transferredBytes, true)}} / {{readableFileSize(file.downloadMeta.totalBytes, true)}}
             </p>
-            <p v-else class="text-slate-500 mb-0 font-semibold text-sm">
+            <p v-else class="file_size text-slate-400 mb-0">
               {{readableFileSize(file.size, true)}}
             </p>
           </div>
@@ -46,12 +46,14 @@
       </div>
       <div v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING" class="progress-section">
         <a-progress
-            strokeColor="#2196f3"
+            strokeColor="#479cd7"
             :show-info="false"
+            status="active"
             :percent="file.downloadMeta.percent * 100"
         />
       </div>
     </div>
+    <a-divider />
   </div>
 </template>
 
@@ -61,6 +63,7 @@ import { DOWNLOAD_STATE, DeviceModel} from "../models";
 import {timeAgo, readableFileSize} from "../utils/strings";
 import {sendMain} from "../utils/ipc-render";
 import {defineComponent} from "vue";
+import {mapState} from "vuex";
 
 export default defineComponent({
   props: ['file'],
@@ -70,7 +73,9 @@ export default defineComponent({
       deviceInfo: (this as any).$settings.get('deviceInfo') as DeviceModel,
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['activeShareRoom'])
+  },
   methods: {
     getFileIconClass,
     timeAgo,
@@ -89,16 +94,30 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.device-name {
+  color: #fa77bc;
+}
+
 .file-box {
   position: relative;
   overflow: hidden;
-  border: 1px solid #dddddd;
+  border: 1px solid #626262;
+  color: #479cd7;
   height: 70px;
 }
 
 .file_icon::before {
   display: inline-block;
   font-size: 28px;
+}
+
+.file_name {
+  font-size: 16px;
+}
+
+*[class^="file_size"] {
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
 .progress-section {

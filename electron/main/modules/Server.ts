@@ -1,6 +1,6 @@
 import express, {Application} from "express";
 import cors from 'cors';
-import { createServer, Server } from "http";
+import {createServer, Server} from "http";
 import {Server as SocketServer, Socket} from "socket.io";
 import CONSTANTS from "../utils/constants";
 import {DefaultEventsMap} from "socket.io/dist/typed-events";
@@ -8,7 +8,7 @@ import {ShareRoom} from "./ShareRoom";
 import * as bodyParser from "body-parser";
 import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
 import {generateUID} from "../utils/utility";
-import {DeviceModel} from "../../models";
+import {DeviceModel, ShareRoomModel} from "../../models";
 import {createReadStream} from 'fs';
 import {basename} from 'path'
 
@@ -18,10 +18,11 @@ export class AppServer {
     private io: SocketServer<DefaultEventsMap>;
 
     private _shareRoom: ShareRoom
+
     constructor() {
         this._expressApp = express();
         this._expressApp.use(cors());
-        this._expressApp.use(bodyParser.urlencoded({ extended: false }));
+        this._expressApp.use(bodyParser.urlencoded({extended: false}));
         this._httpServer = createServer(this._expressApp);
         this.io = new SocketServer(this._httpServer, {
             httpCompression: true,
@@ -57,15 +58,19 @@ export class AppServer {
                     next(new Error("NO_ACTIVE_ROOM"));
                     return;
                 }
+                // if room is full reject
+                if (this._shareRoom.room.participants.length >= this._shareRoom.room.maxParticipants) {
+                    next(new Error('ROOM_FULL'));
+                    return;
+                }
                 // If passcode is correct
                 if (socket.handshake.auth && socket.handshake.auth.passcode) {
-                    if (socket.handshake.auth.passcode.toString() !=  this.shareRoom.room.passcode) {
+                    if (socket.handshake.auth.passcode.toString() != this.shareRoom.room.passcode) {
                         next(new Error('AUTH_ERROR'));
                         return;
                     }
                     next();
-                }
-                else {
+                } else {
                     next(new Error('ACCESS_DENIED'));
                 }
             } catch (e) {
@@ -93,7 +98,7 @@ export class AppServer {
             this.initRoomListeners(socket);
             // on disconnection
             socket.on("disconnect", (reason) => {
-               this._shareRoom.removeParticipant(device.id);
+                this._shareRoom.removeParticipant(device.id);
                 socket.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
             });
         })
@@ -116,7 +121,7 @@ export class AppServer {
         });
         // Download file
         this._expressApp.get('/download/', async (req, res, next) => {
-            const { path, type } = req.query;
+            const {path, type} = req.query;
             try {
                 // const fileName = basename(path.toString())
                 // const stream = createReadStream(path.toString());
@@ -128,7 +133,7 @@ export class AppServer {
                 //
                 // stream.pipe(res);
                 res.download(path.toString())
-            } catch(err) {
+            } catch (err) {
                 res.sendStatus(500);
             }
         });
@@ -138,19 +143,38 @@ export class AppServer {
     initRoomListeners(socket: Socket) {
         // when a file is added to room
         socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (data) => {
-            // Add Ids and shared Date to files
-            let files = JSON.parse(data).files.map(file => {
-                return {
-                    id: generateUID('doc', (this._shareRoom.room.files.length + 1).toString()),
-                    sharedDate: (new Date()).toISOString(),
-                    ...file
-                }
-            });
+            let files = JSON.parse(data).files;
+            // Only add files that are not in the room
+            files = files
+                .filter(file => {
+                    const exist = this._shareRoom.room.files.findIndex(rf => {
+                        return rf.device.id == file.device.id && rf.device.path === file.device.path
+                    });
+                    return exist < 0;
+                })
+                .map(file => {
+                    // Add Ids and shared Date to files
+                    return {
+                        id: generateUID('doc', (this._shareRoom.room.files.length + 1).toString()),
+                        sharedDate: (new Date()).toISOString(),
+                        ...file
+                    }
+                });
             // Add files to room data
             this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
 
             socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
         })
+    }
+
+    async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {
+        if (this._shareRoom.isRoomActive) return this._shareRoom.room;
+        return this._shareRoom.createRoom(name, maxParticipants)
+    }
+
+    closeRoom() {
+        this.io.disconnectSockets()
+        this._shareRoom.closeRoom();
     }
 
     stopServer() {

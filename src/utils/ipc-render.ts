@@ -2,6 +2,7 @@ import {ipcRenderer} from "electron";
 
 declare type MAIN_EVENTS =
     'get-ip' | 'find-rooms' | 'create-room' |
+    'close-room' |
     'file-download-progress' | 'file-download-started' |
      'file-download-complete' | 'total-download-progress' |
     'file-download-canceled' | 'download-file' | 'cancel-download' |

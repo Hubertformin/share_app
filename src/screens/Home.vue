@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex flex-col justify-center items-center">
+  <div class="main-page h-screen flex flex-col justify-center items-center">
     <h2 class="text-2xl">ShareRoom</h2>
     <div class="actions flex gap-4">
       <a-button type="primary" shape="round" size="large" @click="modalVisible = true">
@@ -50,7 +50,9 @@
 </template>
 
 <style lang="scss">
-
+.main-page {
+  background: linear-gradient(to bottom, #14757e, #09253b);
+}
 </style>
 
 <script lang="ts">
@@ -60,6 +62,7 @@ import {fetchMain} from "../utils/ipc-render";
 import {DeviceModel} from "../models";
 import {io} from "socket.io-client";
 import {mapMutations} from "vuex";
+import { notification } from 'ant-design-vue';
 
 interface FormState {
   name: string;
@@ -133,7 +136,13 @@ export default defineComponent({
               this.$router.push('/room-radar');
 
             })
-            .catch(console.error)
+            .catch(err => {
+              console.error(err);
+              notification.warn({
+                message: 'Unable to create a ShareRoom',
+                description: 'There was a problem creating the a share room. If the issue persist, Please restart the application'
+              });
+            })
         .finally(() => (this.loading = false))
       } catch (e) {
         console.error(e)

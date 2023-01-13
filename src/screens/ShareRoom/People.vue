@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full px-4 pb-3 bg-gray-100">
+  <div class="h-full px-4 pb-3">
 
     <div class="header flex items-center justify-between">
       <div class="flex items-center gap-1">
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <div class="body bg-white rounded-xl pt-3 px-2 border pb-6 pt-4">
+    <div class="body rounded-xl pt-3 px-2 border pb-6 pt-4">
       <div v-for="(device, index) in roomDevices" class="device-card flex pb-3 mb-6 border-b justify-between px-4">
         <div class="">
           <h4 class="font-bold mb-0 text-lg">{{device.name}}</h4>
@@ -61,5 +61,6 @@ $header-height: 50px;
 .body {
   height: calc(100% - $header-height);
   overflow-y: auto;
+  background-color: #26272a;
 }
 </style>

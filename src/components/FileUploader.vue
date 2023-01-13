@@ -111,11 +111,11 @@ $dropzone-height: 65px;
     left: 0;
     right: 0;
     border: 1px solid #83bef8;
-    background-color: #f6fcff;
+    background-color: #002f46;
     cursor: pointer;
     transition: all 0.4s linear;
     .text {
-      color: #00488d;
+      color: white;
     }
     &.dragOver {
       transform: scale(1.01);
@@ -126,7 +126,7 @@ $dropzone-height: 65px;
     }
 
     &:hover {
-      background-color: #e9eef5;
+      background-color: #045073;
     }
   }
 }

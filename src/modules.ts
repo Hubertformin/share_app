@@ -1,5 +1,5 @@
 import Antd from 'ant-design-vue';
-import 'ant-design-vue/dist/antd.css';
+import 'ant-design-vue/dist/antd.dark.css';
 import 'file-icons-js/css/style.css'
 import bottomNavigationVue from "bottom-navigation-vue";
 import "bottom-navigation-vue/dist/style.css";

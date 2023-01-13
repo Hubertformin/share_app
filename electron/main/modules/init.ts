@@ -17,8 +17,8 @@ export async function initApp() {
         const userInfo = os.userInfo();
         settings.set('deviceInfo', {
             id: `${userInfo.uid}_${userInfo.username}`,
-            name: userInfo.username,
-            platform: osName.codename,
+            name: osName.hostname || userInfo.username,
+            platform: osName.codename || osName.distro,
         })
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full px-4 pb-3 bg-gray-100">
+  <div class="h-full px-4 pb-3">
     <div class="header flex items-center justify-between">
       <div class="flex items-center gap-1">
         <h1 class="text-lg mb-0 font-bold">Saved Files</h1>
@@ -10,7 +10,7 @@
         </a-button>
       </div>
     </div>
-    <div class="body bg-white rounded-xl pt-6 px-3 pr-6 border pb-6 pt-4">
+    <div class="body rounded-xl pt-6 px-3 pr-6 border pb-6 pt-4">
       <div v-for="(file, index) in files"
            class="file-box cursor-pointer cursor-p ml-2 mb-5 rounded-lg px-4 flex items-center justify-between"
            @dblclick="openFile(file.downloadMeta?.path)"
@@ -86,6 +86,7 @@ $header-height: 50px;
 .body {
   height: calc(100% - $header-height);
   overflow-y: auto;
+  background-color: #26272a;
 }
 .file-box {
   position: relative;

@@ -1,7 +1,13 @@
 import axios from "axios";
 import CONSTANTS from "../utils/constants";
 import {ConfigModel, DeviceModel, ShareRoomModel} from "../../models";
-import {findDevicesInNetwork, generateShortPasscode, generateUID, getHostIp} from "../utils/utility";
+import {
+    findDevicesInNetwork,
+    generateRandomColor,
+    generateShortPasscode,
+    generateUID,
+    getHostIp
+} from "../utils/utility";
 import Store from "electron-store";
 
 const settings = new Store();
@@ -23,24 +29,29 @@ export class ShareRoom {
     }
 
     async findRooms(): Promise<any[]> {
-        // Get all devices in netwwork
-        const devices = await findDevicesInNetwork();
+        // signal: 'SIGTERM',
+        try {
+            // Get all devices in network
+            const devices = await findDevicesInNetwork();
 
-        const rooms: any[] = [];
-        // Get devices meta info by connecting to server
-        for (const device of devices) {
-            console.log(`[connection]: http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`)
-            try {
-                const room = await axios.get(`http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`, {
-                    timeout: 2500
-                });
-                rooms.push({...room.data, hostIp: device.ip});
-            } catch (e) {
-                console.log(e.response)
+            const rooms: any[] = [];
+            // Get devices meta info by connecting to server
+            for (const device of devices) {
+                // console.log(`[connection]: http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`)
+                try {
+                    const room = await axios.get(`http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`, {
+                        timeout: 2500
+                    });
+                    rooms.push({...room.data, hostIp: device.ip});
+                } catch (e) {
+                    console.log(e.response)
+                }
             }
+            return rooms;
+        } catch (e) {
+            console.log(e.signal)
+            return [];
         }
-        console.log(rooms)
-        return rooms;
     }
 
     async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {
@@ -53,6 +64,7 @@ export class ShareRoom {
             id: generateUID('rm', deviceInfo.id),
             name,
             files: [],
+            color: generateRandomColor(),
             hostIp: getHostIp(),
             maxParticipants: maxParticipants || config.maxParticipants,
             deviceId: deviceInfo.id,

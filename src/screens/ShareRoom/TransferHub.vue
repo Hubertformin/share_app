@@ -1,13 +1,14 @@
 <template>
-  <div class="h-full px-4 pb-3 bg-gray-100">
+  <div class="page h-full px-4 pb-3">
     <div class="header flex items-center justify-between">
       <h1 class="text-lg mb-0 font-bold">Transfer Hub</h1>
       <div class="action">
-        <p class="text-slate-500">Hubert, Mark are adding files to room..</p>
+<!--        <p class="text-slate-400">Hubert, Mark are adding files to room..</p>-->
+<!--        <a-progress type="circle" :percent="30" :show-info="false" :width="25" />-->
       </div>
     </div>
     <div
-        class="body bg-white rounded-xl pt-3 px-2 border pb-6"
+        class="body rounded-xl pt-3 px-2 border pb-6"
         :class="{dragOver: isDragging}"
         @dragover="dragover"
         @dragleave="dragleave"
@@ -98,6 +99,9 @@ export default defineComponent({
 $header-height: 50px;
 $footer-height: 80px;
 $dropzone-height: 65px;
+.page {
+
+}
 .header {
   height: $header-height;
 }
@@ -106,9 +110,11 @@ $dropzone-height: 65px;
   height: calc(100% - ($header-height + $footer-height));
   overflow-y: auto;
   transition: all 0.4s ease;
+  background-color: #26272a;
   &.dragOver {
     transform: scale(1.008);
     border: 1px dashed #2196f3;
+    background-color: #10293d;
   }
 }
 

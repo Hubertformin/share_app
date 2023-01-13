@@ -142,7 +142,12 @@ ipcMain.handle('find-rooms', async (_, arg) => {
 ipcMain.handle('create-room', async (_, arg) => {
   const {name, maxParticipants} = JSON.parse(arg);
 
-  return await appServer.shareRoom.createRoom(name, maxParticipants);
+  return await appServer.createRoom(name, maxParticipants);
+});
+
+ipcMain.handle('close-room', async (_, arg) => {
+  appServer.closeRoom();
+  return true;
 });
 
 interface FileDownload extends FileModel {

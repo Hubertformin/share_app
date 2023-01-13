@@ -1,11 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+  ---theme-border-color: #4d4d4d;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  border-color: #666;
+}
+
+.border-color-theme {
+  border-color: var(---theme-border-color);
 }
 
 body {
@@ -16,11 +24,16 @@ body {
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #1E1E1E !important;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+
+.sm-btn-icon:not(.sm-btn-icon-active) .ov-icon {
+  fill: white !important;
 }

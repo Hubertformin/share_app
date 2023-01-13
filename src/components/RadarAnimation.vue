@@ -2,24 +2,37 @@
 <div class="body h-screen flex justify-center items-center w-full">
   <div class="text-container">
     <div class="head text-center">
-      <h1 class="text-2xl mb-1 font-bold">Finding ShareRooms..</h1>
-      <p class="font-medium text-slate-600">Searching for ShareRooms in your local network</p>
+      <h1 class="text-2xl mb-1 font-bold">
+        {{isLoading ? 'Finding ShareRooms..' : 'No ShareRooms Found'}}
+      </h1>
+      <p class="font-medium text-slate-300">
+        {{isLoading ?
+          'Searching for ShareRooms in your local network' :
+          'Make sure you are connected to the same network as the host computer'
+        }}
+      </p>
     </div>
 
     <div class="foot text-center">
-      <p class="text-medium text-center mb-6">
+      <p v-if="isLoading" class="text-medium text-center mb-6">
         <span class="font-bold underline">Can't find room?</span>
         Make sure you are connected to the same network as the host computer
       </p>
-      <a-button class="px-24" danger type="primary" shape="round" size="large" @click="$router.push('/')">
+      <a-button v-if="isLoading" class="px-24" danger type="primary" shape="round" size="large" @click="$router.push('/')">
         <!--        <template #icon>-->
         <!--          <v-icon name="bi-ui-checks-grid" />-->
         <!--        </template>-->
         Stop Search
       </a-button>
+      <a-button v-else class="px-24" type="ghost" shape="round" size="large" @click="$emit('onSearch')">
+                <template #icon>
+                  <v-icon name="pr-refresh" />
+                </template>
+        Search again
+      </a-button>
     </div>
   </div>
-  <div class="load">
+  <div class="load" :class="{isLoading: isLoading}">
     <!--    <div class="green-scanner"></div>-->
   </div>
 </div>
@@ -29,13 +42,14 @@
 import {defineComponent} from "vue";
 
 export default defineComponent({
-  name: "RadarAnimation.vue"
+  name: "RadarAnimation.vue",
+  props: ['isLoading']
 })
 </script>
 
 <style scoped lang="scss">
-$bg-color: #e9fffa;
-$text-color: #101c3d;
+$bg-color: linear-gradient(to bottom, #14757e, #101c3d);
+$text-color: #e9fffa;
 .text-container {
   position: fixed;
   top: 0;
@@ -58,12 +72,12 @@ $text-color: #101c3d;
 .foot {
   position: absolute;
   color: $text-color;
-  bottom: 50px;
+  bottom: 75px;
   left: 50%;
   transform: translateX(-50%);
 }
 .body {
-  background-color: $bg-color;
+  background: $bg-color;
 }
 
 .green-scanner {
@@ -99,9 +113,9 @@ $text-color: #101c3d;
   background-color: #80c5f0;
   border-radius: 100px;
   position:relative;
-  animation: pulse 2000ms linear infinite;
-  -webkit-animation: pulse 2000ms linear infinite;
-  -moz-animation: pulse 2000ms linear infinite;
+  &.isLoading {
+    animation: pulse 2000ms linear infinite;
+  }
 }
 
 .load i{

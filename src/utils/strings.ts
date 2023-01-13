@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 dayjs.extend(relativeTime)
 
 export function titleCase(value: string) {
@@ -22,7 +23,7 @@ export function timeAgo(date: string) {
  *
  * @return Formatted string.
  */
-export function readableFileSize(bytes: number, si=false, dp=1) {
+export function readableFileSize(bytes: number, si = false, dp = 1) {
     const thresh = si ? 1000 : 1024;
 
     if (Math.abs(bytes) < thresh) {
@@ -33,7 +34,7 @@ export function readableFileSize(bytes: number, si=false, dp=1) {
         ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
         : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
     let u = -1;
-    const r = 10**dp;
+    const r = 10 ** dp;
 
     do {
         bytes /= thresh;

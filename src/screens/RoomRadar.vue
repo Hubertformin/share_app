@@ -8,8 +8,15 @@
 <!--    <div class="green-scanner"></div>-->
   </div>
 
-  <div class="foot">
-    <p class="text-medium">Waiting for people to join...</p>
+  <div class="foot text-center">
+    <a-button @click="$router.push('/share-room')">Go</a-button>
+    <p class="text-medium mb-3">Waiting for people to join...</p>
+    <a-button class="px-24" danger type="primary" shape="round" size="large" @click="closeRoom">
+      <!--        <template #icon>-->
+      <!--          <v-icon name="bi-ui-checks-grid" />-->
+      <!--        </template>-->
+      Stop ShareRoom
+    </a-button>
   </div>
 </div>
 </template>
@@ -17,11 +24,34 @@
 <script lang="ts">
 import {mapState} from "vuex";
 import {defineComponent} from "vue";
+import {fetchMain} from "../utils/ipc-render";
+import {notification} from "ant-design-vue";
 
 export default defineComponent({
   name: "RoomRadar",
   computed: {
-    ...mapState(['activeShareRoom'])
+    ...mapState(['activeShareRoom', 'roomDevices'])
+  },
+  watch: {
+    roomDevices: function (newVal, oldVal) {
+      if (newVal.length > 0) {
+        this.$router.push('/share-room')
+      }
+    }
+  },
+  methods: {
+    closeRoom() {
+      fetchMain('close-room')
+          .then(() => this.$router.push('/'))
+          .catch((e) => {
+            console.log(e);
+            notification.warn({
+              message: 'Failed to close room',
+              description: 'There was a problem closing this room. Please try again'
+            })
+          })
+
+    }
   }
 })
 </script>

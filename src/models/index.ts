@@ -34,6 +34,7 @@ export interface DeviceModel {
 export interface ShareRoomModel {
     id: string;
     name: string;
+    color: string;
     participants: DeviceModel[]
     deviceId: string;
     maxParticipants: number;
