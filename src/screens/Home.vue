@@ -54,7 +54,7 @@
 </style>
 
 <script lang="ts">
-import {reactive, ref, watch} from "vue";
+import {defineComponent, reactive, ref, watch} from "vue";
 import {FormInstance} from "ant-design-vue";
 import {fetchMain} from "../utils/ipc-render";
 import {DeviceModel} from "../models";
@@ -66,7 +66,7 @@ interface FormState {
   maxParticipants: number
 }
 
-export default {
+export default defineComponent({
   setup() {
     const modalVisible = ref<boolean>(false);
 
@@ -140,5 +140,5 @@ export default {
       }
     }
   },
-}
+});
 </script>

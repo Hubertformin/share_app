@@ -38,8 +38,9 @@ import {mapState} from "vuex";
 import {DeviceModel} from "../../models";
 import {fetchMain} from "../../utils/ipc-render";
 import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   name: "TransferHub",
   components: {FileCard, FileUploader},
   data() {
@@ -90,7 +91,7 @@ export default {
       (this as any).socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, JSON.stringify({files}))
     }
   }
-}
+})
 </script>
 
 <style scoped lang="scss">

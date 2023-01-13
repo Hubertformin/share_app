@@ -2,10 +2,10 @@
 // @ts-ignore
 import { SwipeBottomNavigation } from "bottom-navigation-vue";
 import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
-import {io, Socket} from "socket.io-client";
 import {mapMutations, mapState} from "vuex";
 import {DOWNLOAD_STATE} from "../../models";
-export default {
+import {defineComponent} from "vue";
+export default defineComponent({
   components: { SwipeBottomNavigation },
   data: () => ({
     selected: 1,
@@ -70,7 +70,7 @@ export default {
       })
     },
   }
-};
+});
 </script>
 
 <template>

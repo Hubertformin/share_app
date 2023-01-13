@@ -32,8 +32,9 @@ import {SHARE_ROOM_EVENTS} from "../models/socket-events";
 import {DeviceModel} from "../models";
 import { fetchMain } from "../utils/ipc-render";
 import { mapState } from "vuex";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   name: "FileUploader",
   data() {
     return {
@@ -91,7 +92,7 @@ export default {
       (this as any).socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, JSON.stringify({files}))
     }
   }
-}
+})
 </script>
 
 <style scoped lang="scss">

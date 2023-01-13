@@ -60,8 +60,9 @@ import {getFileIconClass} from "../utils/file-icon";
 import { DOWNLOAD_STATE, DeviceModel} from "../models";
 import {timeAgo, readableFileSize} from "../utils/strings";
 import {sendMain} from "../utils/ipc-render";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   props: ['file'],
   data() {
     return {
@@ -84,7 +85,7 @@ export default {
       sendMain('cancel-download', this.file)
     }
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -49,8 +49,9 @@ import {mapState} from "vuex";
 import {DOWNLOAD_STATE, FileModel} from "../../models";
 import {readableFileSize} from "../../utils/strings";
 import {sendMain} from "../../utils/ipc-render";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   name: "Files",
   data() {
     return {
@@ -74,7 +75,7 @@ export default {
       sendMain('open-file', path)
     }
   },
-}
+})
 </script>
 
 <style scoped lang="scss">

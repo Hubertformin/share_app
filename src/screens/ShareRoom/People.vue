@@ -31,8 +31,9 @@
 <script lang="ts">
 import {mapState} from "vuex";
 import {timeAgo, titleCase} from "../../utils/strings";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   name: "People",
   computed: {
     ...mapState(['roomDevices'])
@@ -49,7 +50,7 @@ export default {
       return 'md-device-unknown'
     }
   }
-}
+})
 </script>
 
 <style scoped lang="scss">
