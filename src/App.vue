@@ -24,7 +24,13 @@ export default defineComponent({
 
   },
   methods: {
-    ...mapMutations(['updateFileDownloadData', 'updateTotalDownloadData', 'addFilesToRoom', 'addDevicesToRoom']),
+    ...mapMutations([
+        'updateFileDownloadData',
+        'updateTotalDownloadData',
+        'addFilesToRoom',
+        'addDevicesToRoom',
+        'setSocket'
+    ]),
     /**
      * Initialize socket
      */
@@ -61,6 +67,7 @@ export default defineComponent({
       });
       // Listen to files in the room
       socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files:  any[]) => {
+        console.log('files')
         // Add download meta data
         files = files.map((file: any) => {
           file['downloadMeta'] = {
@@ -77,9 +84,12 @@ export default defineComponent({
       });
       // Listen to devices in room
       socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices: string) => {
+        console.log(devices)
         // Add to state...
         this.addDevicesToRoom(JSON.parse(devices));
       });
+      // Set socket for other components
+      this.setSocket(socket);
     },
     listenToDownloadEvents() {
       listenToMainEvents('file-download-started', (data) => {
@@ -141,6 +151,9 @@ export default defineComponent({
           }
         });
       });
+    },
+    beforeDestroy() {
+      console.log('destroyed')
     }
   }
 });

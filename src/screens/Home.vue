@@ -120,18 +120,18 @@ export default defineComponent({
               console.log(data)
               this.setActiveShareRoom(data);
 
-              const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
-              // Connect to socket
-              const socket = io('ws://127.0.0.1:2391', {
-                auth: {
-                  passcode: data.passcode
-                },
-                query: {
-                  device: JSON.stringify(deviceInfo)
-                }
-              });
-              // update socket var in state
-              this.setSocket(socket);
+              // const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
+              // // Connect to socket
+              // const socket = io('ws://127.0.0.1:2391', {
+              //   auth: {
+              //     passcode: data.passcode
+              //   },
+              //   query: {
+              //     device: JSON.stringify(deviceInfo)
+              //   }
+              // });
+              // @ts-ignore
+              this.$emitter.emit('init-sockets', data.passcode);
               // Route to room scanner
               this.$router.push('/room-radar');
 

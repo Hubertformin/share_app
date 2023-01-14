@@ -144,6 +144,7 @@ export class AppServer {
         // when a file is added to room
         socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (data) => {
             let files = JSON.parse(data).files;
+            console.log(files)
             // Only add files that are not in the room
             files = files
                 .filter(file => {
@@ -162,7 +163,7 @@ export class AppServer {
                 });
             // Add files to room data
             this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
-
+            console.log('before emit')
             socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
         })
     }
