@@ -63,7 +63,7 @@ const store = createStore({
             Object.assign(state.totalDownloads, payload)
         },
         addDevicesToRoom(state, payload: DeviceModel[]) {
-            state.roomDevices.unshift(...payload)
+            state.roomDevices = [...payload]
         },
         setSocket(state, payload) {
             state.socket = payload;

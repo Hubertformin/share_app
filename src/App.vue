@@ -19,7 +19,6 @@ export default defineComponent({
     this.listenToDownloadEvents();
     // @ts-ignore
     this.$emitter.on('init-sockets', ({passcode, route}) => {
-      console.log(route)
       this.initSockets(passcode, route);
     })
 
@@ -68,7 +67,6 @@ export default defineComponent({
       });
       // Listen to files in the room
       socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files:  any[]) => {
-        console.log('files')
         // Add download meta data
         files = files.map((file: any) => {
           file['downloadMeta'] = {
@@ -152,9 +150,6 @@ export default defineComponent({
           }
         });
       });
-    },
-    beforeDestroy() {
-      console.log('destroyed')
     }
   }
 });

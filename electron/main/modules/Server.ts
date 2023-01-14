@@ -9,8 +9,6 @@ import * as bodyParser from "body-parser";
 import {SHARE_ROOM_EVENTS} from "../../models/socket-events";
 import {generateUID} from "../utils/utility";
 import {DeviceModel, ShareRoomModel} from "../../models";
-import {createReadStream} from 'fs';
-import {basename} from 'path'
 
 export class AppServer {
     private readonly _expressApp: Application;
@@ -107,7 +105,7 @@ export class AppServer {
     initRoutes() {
         // get Share room info
         this._expressApp.use((req, res, next) => {
-            if (!this._shareRoom.isRoomActive) {
+            if (!req.path.toString().startsWith('/download') && !this._shareRoom.isRoomActive) {
                 return res.status(405).json({code: 'NO_ACTIVE_ROOM'})
             }
             next();
@@ -163,7 +161,6 @@ export class AppServer {
                 });
             // Add files to room data
             this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
-            console.log('before emit')
             this.io.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
         })
     }

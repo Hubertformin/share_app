@@ -34,8 +34,7 @@ export default defineComponent({
   },
   watch: {
     roomDevices: function (newVal, oldVal) {
-      console.log(this.roomDevices)
-      if (newVal.length > 0) {
+      if (newVal.length > 1) {
         this.$router.push('/share-room')
       }
     }

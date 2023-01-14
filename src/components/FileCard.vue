@@ -82,8 +82,7 @@ export default defineComponent({
     readableFileSize,
     download() {
       // download file to local computer
-      const url = `http://${this.file.device.machineIp}:2391/download?path=${this.file.device.path}&type=${this.file.type}`
-      sendMain('download-file', {url, ...this.file})
+      sendMain('download-file', this.file)
     },
     cancelDownload() {
       console.log('cancel')

@@ -157,9 +157,12 @@ interface FileDownload extends FileModel {
 let filesInDownload: FileDownload[] = [];
 ipcMain.on('download-file', async (event, arg) => {
   const file = JSON.parse(arg) as FileDownload;
+  // url
+  const url = `http://${file.device.machineIp}:2391/download?path=${file.device.path}&type=${file.type}`
+  console.log(url)
   // Get config
   const config: ConfigModel = settings.get('config') as ConfigModel;
-  await download(win, file.url, {
+  await download(win, url, {
     directory: config.destinationDir,
     openFolderWhenDone: false,
     overwrite: true,
