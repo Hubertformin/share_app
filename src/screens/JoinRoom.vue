@@ -152,7 +152,7 @@ export default defineComponent({
       this.setActiveShareRoom(this.selectedRoom);
 
       // @ts-ignore
-      this.$emitter.emit('init-sockets', this.selectedRoomPasscode);
+      this.$emitter.emit('init-sockets', {passcode: this.selectedRoomPasscode, route: true});
     }
   }
 })

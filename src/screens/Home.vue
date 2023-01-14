@@ -131,7 +131,7 @@ export default defineComponent({
               //   }
               // });
               // @ts-ignore
-              this.$emitter.emit('init-sockets', data.passcode);
+              this.$emitter.emit('init-sockets', {passcode: data.passcode, route: false});
               // Route to room scanner
               this.$router.push('/room-radar');
 

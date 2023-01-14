@@ -90,7 +90,7 @@ export class AppServer {
                 // add person to devices list
                 this._shareRoom.addToRoom(device);
                 // emit person added event
-                socket.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
             }
             // Add connection room
             socket.join(this._shareRoom.room.name)
@@ -99,7 +99,7 @@ export class AppServer {
             // on disconnection
             socket.on("disconnect", (reason) => {
                 this._shareRoom.removeParticipant(device.id);
-                socket.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
             });
         })
     }
@@ -164,7 +164,7 @@ export class AppServer {
             // Add files to room data
             this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
             console.log('before emit')
-            socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
+            this.io.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
         })
     }
 

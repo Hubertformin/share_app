@@ -18,8 +18,9 @@ export default defineComponent({
     // listen to download events and update state
     this.listenToDownloadEvents();
     // @ts-ignore
-    this.$emitter.on('init-sockets', (passcode: string) => {
-      this.initSockets(passcode);
+    this.$emitter.on('init-sockets', ({passcode, route}) => {
+      console.log(route)
+      this.initSockets(passcode, route);
     })
 
   },
@@ -34,7 +35,7 @@ export default defineComponent({
     /**
      * Initialize socket
      */
-    initSockets(passcode: string) {
+    initSockets(passcode: string, route = true) {
       const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
       // Connect to socket
       console.log('init sockets..')
@@ -53,7 +54,7 @@ export default defineComponent({
       // when connection is established head to room
       socket.on('connect', () => {
         // got to share room home page
-        this.$router.push('/share-room');
+        if (route) this.$router.push('/share-room');
       });
 
       socket.on('error', (e) => {
