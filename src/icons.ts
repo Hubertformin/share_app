@@ -19,7 +19,7 @@ import {
     MdDeviceunknown,
     PrPause, BiStopFill,
     MdPeopleSharp,
-    MdFilecopy, PrRefresh
+    MdFilecopy, PrRefresh, PrSpinner
 } from "oh-vue-icons/icons";
 
 export default function registerIcons() {
@@ -45,6 +45,7 @@ export default function registerIcons() {
         BiStopFill,
         MdPeopleSharp,
         MdFilecopy,
-        PrRefresh
+        PrRefresh,
+        PrSpinner
     );
 }

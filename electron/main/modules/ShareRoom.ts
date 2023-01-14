@@ -13,9 +13,9 @@ import Store from "electron-store";
 const settings = new Store();
 
 
-
 export class ShareRoom {
     private _room: ShareRoomModel;
+
     constructor() {
         this._room = null;
     }
@@ -30,28 +30,24 @@ export class ShareRoom {
 
     async findRooms(): Promise<any[]> {
         // signal: 'SIGTERM',
-        try {
-            // Get all devices in network
-            const devices = await findDevicesInNetwork();
+        // Get all devices in network
+        const devices = await findDevicesInNetwork();
+        console.log(devices)
 
-            const rooms: any[] = [];
-            // Get devices meta info by connecting to server
-            for (const device of devices) {
-                // console.log(`[connection]: http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`)
-                try {
-                    const room = await axios.get(`http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`, {
-                        timeout: 2500
-                    });
-                    rooms.push({...room.data, hostIp: device.ip});
-                } catch (e) {
-                    console.log(e.response)
-                }
+        const rooms: any[] = [];
+        // Get devices meta info by connecting to server
+        for (const device of devices) {
+            // console.log(`[connection]: http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`)
+            try {
+                const room = await axios.get(`http://${device.ip}:${CONSTANTS.PUBLIC_PORT}/share-room`, {
+                    timeout: 2500
+                });
+                rooms.push({...room.data.data, hostIp: device.ip});
+            } catch (e) {
+                console.log(e.response)
             }
-            return rooms;
-        } catch (e) {
-            console.log(e.signal)
-            return [];
         }
+        return rooms;
     }
 
     async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {

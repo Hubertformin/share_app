@@ -9,7 +9,7 @@
         Create ShareRoom
       </a-button>
 
-      <a-button shape="round" size="large" @click="$router.push('/join-room')">
+      <a-button type="ghost" shape="round" size="large" @click="$router.push('/join-room')">
         <template #icon>
           <v-icon name="bi-ui-checks-grid" />
         </template>

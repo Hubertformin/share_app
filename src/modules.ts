@@ -8,6 +8,8 @@ import {OhVueIcon} from "oh-vue-icons";
 import registerIcons from "./icons";
 import store from "./store";
 import Store from 'electron-store';
+import mitt from 'mitt';
+const emitter = mitt();
 
 
 export function registerModules(app: any) {
@@ -21,4 +23,5 @@ export function registerModules(app: any) {
      * GLOBAL VARIABLES
      */
     app.config.globalProperties.$settings = new Store();
+    app.config.globalProperties.$emitter = emitter;
 }

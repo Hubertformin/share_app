@@ -80,39 +80,12 @@ export default defineComponent({
     ]
   }),
   mounted() {
-    /**
-     * A;; listener functions should be init here
-     */
-    this.initListeners()
   },
   computed: {
     ...mapState(['socket', 'activeShareRoom'])
   },
   methods: {
     ...mapMutations(['setSocket', 'addFilesToRoom', 'addDevicesToRoom']),
-    initListeners() {
-      // Listen to files in the room
-      this.socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files:  any[]) => {
-        // Add download meta data
-        files = files.map((file: any) => {
-          file['downloadMeta'] = {
-            state: DOWNLOAD_STATE.NOT_DOWNLOADED,
-            totalBytes: 0,
-            path: '',
-            percent: 0,
-            transferredBytes: 0
-          }
-          return file;
-        });
-        //Add to state...
-        this.addFilesToRoom(files);
-      });
-      // Listen to devices in room
-      this.socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices: string) => {
-        // Add to state...
-        this.addDevicesToRoom(JSON.parse(devices));
-      })
-    },
   }
 });
 </script>

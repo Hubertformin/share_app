@@ -55,6 +55,7 @@
     "express-session": "^1.17.3",
     "file-icons-js": "websemantics/file-icons-js",
     "local-devices": "^4.0.0",
+    "mitt": "^3.0.0",
     "nodejs-file-downloader": "^4.10.6",
     "oh-vue-icons": "^1.0.0-rc3",
     "os-name": "^5.1.0",
