@@ -25,12 +25,12 @@ export default defineComponent({
   },
   methods: {
     ...mapMutations([
-        'updateFileDownloadData',
-        'updateTotalDownloadData',
-        'addFilesToRoom',
-        'addDevicesToRoom',
-        'setSocket',
-        'clearRoomData'
+      'updateFileDownloadData',
+      'updateTotalDownloadData',
+      'addFilesToRoom',
+      'addDevicesToRoom',
+      'setSocket',
+      'clearRoomData'
     ]),
     /**
      * Initialize socket
@@ -68,32 +68,34 @@ export default defineComponent({
         if (e.toString().includes('NO_ACTIVE_ROOM')) {
           msg.message = `${this.activeShareRoom.name} is no longer active`;
           msg.description = `${this.activeShareRoom.name} room is no longer active because it has been terminated by the user`
-        }
-
-        if (e.toString().includes('ROOM_FULL')) {
+        } else if (e.toString().includes('ROOM_FULL')) {
           msg.message = `The ${this.activeShareRoom.name} room is full`;
           msg.description = `${this.activeShareRoom.name} room has reached it's maximum occupancy.`
-        }
-
-        if (e.toString().includes('AUTH_ERROR')) {
+        } else if (e.toString().includes('AUTH_ERROR')) {
           msg.message = 'Wrong passcode';
           msg.description = 'The passcode you submitted is wrong, Please try again or ask room admin to provide you with it.'
+        } else {
+          this.$router.push('/').then(() => this.clearRoomData())
         }
-        // this.$router.push('/').then(() => this.clearRoomData())
-        notification.warn(msg);
+        // Notify only if pc is not the owner of the room
+        if (deviceInfo.id !== (this.activeShareRoom as ShareRoomModel).deviceId) {
+          notification.warn(msg);
+        }
       });
 
       socket.on('disconnect', (e) => {
-        this.$router.push('/').then(() => this.clearRoomData())
-        notification.info({
-          message: `${this.activeShareRoom.name}'s room was terminated`,
-          description: `
-          ${this.activeShareRoom.name}'s was terminated by owner, You can connect to another room.
-          `
-        })
+        this.$router.push('/').then(() => this.clearRoomData());
+        // TODO: CLOSE ROOM INCASE OWNER OF THE ROOM WAS DISCONNECTED
+        // Notify only if pc is not the owner of the room
+        if (deviceInfo.id !== (this.activeShareRoom as ShareRoomModel).deviceId) {
+          notification.info({
+            message: `${this.activeShareRoom.name}'s room was terminated`,
+            description: `${this.activeShareRoom.name}'s was terminated by owner, You can connect to another room.`
+          });
+        }
       });
       // Listen to files in the room
-      socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files:  any[]) => {
+      socket.on(SHARE_ROOM_EVENTS.ON_FILE_ADD, (files: any[]) => {
         // Add download meta data
         files = files.map((file: any) => {
           file['downloadMeta'] = {

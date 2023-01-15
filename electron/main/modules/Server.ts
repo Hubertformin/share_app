@@ -99,7 +99,9 @@ export class AppServer {
                 this._shareRoom.removeParticipant(device.id);
                 this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.getRoom().participants));
             });
-        })
+        }).on("disconnect", (reason) => {
+            console.log(reason)
+        });
     }
 
     initRoutes() {
