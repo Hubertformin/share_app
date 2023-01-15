@@ -145,7 +145,7 @@ export default defineComponent({
         return;
       }
 
-      this.isPageLoading = true;
+      // this.isPageLoading = true;
 
       this.setActiveShareRoom(this.selectedRoom);
       // Add the room files to state...

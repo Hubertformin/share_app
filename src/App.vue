@@ -57,14 +57,30 @@ export default defineComponent({
       });
 
       socket.on('connect_error', (e) => {
-        console.log(e)
-        // this.$router.push('/').then(() => this.clearRoomData())
-        notification.warn({
+        console.log(e);
+        let msg = {
           message: `Unable to connect to ${this.activeShareRoom.name}`,
           description: `
-          Unable to connect to ${this.activeShareRoom.name}'s room. Try again. If problem persist, restart application.
+          Unable to connect to ${this.activeShareRoom.name} room. Try again. If problem persist, restart application.
           `
-        })
+        };
+
+        if (e.toString().includes('NO_ACTIVE_ROOM')) {
+          msg.message = `${this.activeShareRoom.name} is no longer active`;
+          msg.description = `${this.activeShareRoom.name} room is no longer active because it has been terminated by the user`
+        }
+
+        if (e.toString().includes('ROOM_FULL')) {
+          msg.message = `The ${this.activeShareRoom.name} room is full`;
+          msg.description = `${this.activeShareRoom.name} room has reached it's maximum occupancy.`
+        }
+
+        if (e.toString().includes('AUTH_ERROR')) {
+          msg.message = 'Wrong passcode';
+          msg.description = 'The passcode you submitted is wrong, Please try again or ask room admin to provide you with it.'
+        }
+        // this.$router.push('/').then(() => this.clearRoomData())
+        notification.warn(msg);
       });
 
       socket.on('disconnect', (e) => {

@@ -14,7 +14,7 @@
             <v-icon name="md-settingsinputantenna-outlined" scale="2.2" fill="white"/>
           </div>
           <div class="tile">
-            <h2 class="text-lg text-white font-semibold mb-0">{{ activeShareRoom.name }}'s room</h2>
+            <h2 class="text-lg text-white font-semibold mb-0">{{ activeShareRoom.name }} room</h2>
             <p class="text-gray-300 mb-0">Passcode: <span
                 class="font-bold underline">{{ activeShareRoom.passcode }}</span></p>
           </div>
