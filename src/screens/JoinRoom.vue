@@ -83,7 +83,7 @@ import {mapMutations, mapState} from "vuex";
 import {defineComponent, ref} from "vue";
 import RadarAnimation from '../components/RadarAnimation.vue';
 import {fetchMain} from "../utils/ipc-render";
-import {DeviceModel, ShareRoomModel} from "../models";
+import {DeviceModel, DOWNLOAD_STATE, ShareRoomModel} from "../models";
 import {message, notification} from "ant-design-vue";
 import {io} from "socket.io-client";
 
@@ -113,16 +113,14 @@ export default defineComponent({
   methods: {
     ...mapMutations(['setSocket', "setActiveShareRoom", "addFilesToRoom"]),
     loadRooms() {
-      console.log('finding rooms');
       fetchMain<ShareRoomModel[]>('find-rooms')
           .then((data) => {
-            // Stop showning fetching animation if no rooms have been found
-            console.log(data)
+            // Stop showing fetching animation if no rooms have been found
             this.isFetchingRooms = data.length > 0;
             this.shareRooms = data;
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             this.isFetchingRooms = false;
             notification.warn({
               message: 'Unable to find rooms',
@@ -151,7 +149,17 @@ export default defineComponent({
 
       this.setActiveShareRoom(this.selectedRoom);
       // Add the room files to state...
-      this.addFilesToRoom((this.selectedRoom as ShareRoomModel).files)
+      this.addFilesToRoom((this.selectedRoom as ShareRoomModel).files.map(file => {
+        file['downloadMeta'] = {
+          canResume: false,
+          state: DOWNLOAD_STATE.NOT_DOWNLOADED,
+          totalBytes: 0,
+          path: '',
+          percent: 0,
+          transferredBytes: 0
+        }
+        return file;
+      }))
       // @ts-ignore
       this.$emitter.emit('init-sockets', {passcode: this.selectedRoomPasscode, route: true});
     }

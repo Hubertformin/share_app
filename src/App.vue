@@ -37,9 +37,7 @@ export default defineComponent({
     initSockets(passcode: string, route = true) {
       const deviceInfo: DeviceModel = (this as any).$settings.get('deviceInfo') as DeviceModel;
       // Connect to socket
-      console.log('init sockets..')
       const url = `ws://${(this.activeShareRoom as ShareRoomModel).hostIp}:2391`;
-      console.log(url)
       const socket = io(url, {
         auth: {
           passcode
@@ -58,7 +56,7 @@ export default defineComponent({
       });
 
       socket.on('error', (e) => {
-        console.log(e)
+        console.error(e)
         notification.warn({
           message: `Unable to join room`,
           description: `
@@ -71,6 +69,7 @@ export default defineComponent({
         // Add download meta data
         files = files.map((file: any) => {
           file['downloadMeta'] = {
+            canResume: false,
             state: DOWNLOAD_STATE.NOT_DOWNLOADED,
             totalBytes: 0,
             path: '',
@@ -84,7 +83,6 @@ export default defineComponent({
       });
       // Listen to devices in room
       socket.on(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, (devices: string) => {
-        console.log(devices)
         // Add to state...
         this.addDevicesToRoom(JSON.parse(devices));
       });
