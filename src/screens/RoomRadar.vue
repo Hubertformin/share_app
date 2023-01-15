@@ -11,7 +11,7 @@
   </div>
 
   <div class="foot text-center">
-    <a-button @click="$router.push('/share-room')">Go</a-button>
+<!--    <a-button @click="$router.push('/share-room')">Go</a-button>-->
 
     <a-button class="px-24" danger type="primary" shape="round" size="large" @click="closeRoom">
       <!--        <template #icon>-->

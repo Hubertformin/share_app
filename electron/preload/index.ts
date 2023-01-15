@@ -40,14 +40,47 @@ function useLoading() {
   75% { transform: perspective(100px) rotateX(0) rotateY(180deg); }
   100% { transform: perspective(100px) rotateX(0) rotateY(0); }
 }
+@keyframes pulse {
+   0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(77, 786, 220, 0.7);
+   }
+
+   70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(77, 786, 220, 0);
+   }
+
+   100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(77, 786, 220, 0);
+   }
+}
 .${className} > div {
   animation-fill-mode: both;
-  width: 50px;
-  height: 50px;
+  width: 200px;
+  height: 200px;
+  border-radius: 100%;
   background: #fff;
-  animation: square-spin 3s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
+  box-shadow: 0 0 0 0 rgba(77, 786, 220, 1);
+   transform: scale(1);
+   animation: pulse 2s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
+}
+.${className} > div img {
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+}
+.${className} > h2 {
+  color: white;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  margin: 44px 0;
+  font-size: 24px;
+  font-weight: 600;
 }
 .app-loading-wrap {
+  background: linear-gradient(to bottom, #002e31, #001b2c);
   position: fixed;
   top: 0;
   left: 0;
@@ -56,7 +89,6 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #282c34;
   z-index: 9;
 }
     `
@@ -66,7 +98,7 @@ function useLoading() {
   oStyle.id = 'app-loading-style'
   oStyle.innerHTML = styleContent
   oDiv.className = 'app-loading-wrap'
-  oDiv.innerHTML = `<div class="${className}"><div></div></div>`
+  oDiv.innerHTML = `<div class="${className}"><div><img src="/icon.png" /></div><h2>ShareRoom</h2></div>`
 
   return {
     appendLoading() {

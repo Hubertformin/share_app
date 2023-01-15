@@ -46,7 +46,7 @@ const indexHtml = join(process.env.DIST, 'index.html')
 async function createWindow() {
 
   const screenSize = screen.getPrimaryDisplay().size;
-  const width = 1000, height = 800;
+  const width = process.env.VITE_DEV_SERVER_URL ? 1000 : 760, height = 800;
   win = new BrowserWindow({
     title: 'Share App',
     width,
