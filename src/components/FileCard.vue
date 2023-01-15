@@ -4,14 +4,22 @@
       <h2 class="device-name font-bold mb-0">{{file.device.name}}</h2>
       <p class="mb-0 font-medium text-slate-400 text-sm">{{timeAgo(file.sharedDate)}}</p>
     </div>
-    <div class="file-box cursor-p ml-2 rounded-lg px-4 flex items-center justify-between">
+    <div class="file-box cursor-pointer ml-2 rounded-lg px-4 flex items-center justify-between" @dblclick="openFile()">
       <div class="leading flex gap-2.5">
         <span class="file_icon" :class="getFileIconClass(file.name)"></span>
         <div class="meta flex flex-col justify-center">
           <p class="file_name mb-0 font-bold">{{file.name}}</p>
           <div class="flex gap-2.5 items-center">
-            <p v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING" class="file_size_downloading text-slate-400 mb-0">
-              {{readableFileSize(file.downloadMeta.transferredBytes, true)}} / {{readableFileSize(file.downloadMeta.totalBytes, true)}}
+            <div class="flex gap-3" v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING">
+              <p class="file_size_downloading text-slate-400 mb-0">
+                {{readableFileSize(file.downloadMeta.transferredBytes, true)}} / {{readableFileSize(file.downloadMeta.totalBytes, true)}}
+              </p>
+              <p class="text-slate-400">
+                {{readableDownloadSpeed(file.downloadMeta.speed)}}
+              </p>
+            </div>
+            <p v-else-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOAD_BUILDING" class="file_size text-slate-400 mb-0">
+              Building..
             </p>
             <p v-else class="file_size text-slate-400 mb-0">
               {{readableFileSize(file.size, true)}}
@@ -33,7 +41,7 @@
               :loading="false"
               @click="cancelDownload"
           >
-            <template #icon><v-icon fill="#ff4d4f" name="bi-stop-fill" scale="1.5"/></template>
+            <template #icon><v-icon fill="#ff4d4f" name="pr-stop-circle" scale="1.5"/></template>
           </a-button>
         </div>
         <a-button
@@ -44,12 +52,13 @@
           <template #icon><v-icon name="bi-download" scale="1.5"/></template>
         </a-button>
       </div>
-      <div v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING" class="progress-section">
+      <div v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING || file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOAD_BUILDING"
+           class="progress-section">
         <a-progress
-            strokeColor="#479cd7"
+            :strokeColor="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOAD_BUILDING ? '#3cc254' : '#479cd7'"
             :show-info="false"
             status="active"
-            :percent="file.downloadMeta.percent * 100"
+            :percent="file.downloadMeta.percent"
         />
       </div>
     </div>
@@ -60,7 +69,7 @@
 <script lang="ts">
 import {getFileIconClass} from "../utils/file-icon";
 import { DOWNLOAD_STATE, DeviceModel} from "../models";
-import {timeAgo, readableFileSize} from "../utils/strings";
+import {timeAgo, readableFileSize, readableDownloadSpeed} from "../utils/strings";
 import {sendMain} from "../utils/ipc-render";
 import {defineComponent} from "vue";
 import {mapState} from "vuex";
@@ -80,6 +89,7 @@ export default defineComponent({
     getFileIconClass,
     timeAgo,
     readableFileSize,
+    readableDownloadSpeed,
     download() {
       // download file to local computer
       sendMain('download-file', this.file)
@@ -87,6 +97,10 @@ export default defineComponent({
     cancelDownload() {
       console.log('cancel')
       sendMain('cancel-download', this.file)
+    },
+    openFile() {
+      if (this.file.downloadMeta.state !== DOWNLOAD_STATE.DOWNLOAD_COMPLETE) return;
+      sendMain('open-file', this.file.downloadMeta?.path)
     }
   },
 })

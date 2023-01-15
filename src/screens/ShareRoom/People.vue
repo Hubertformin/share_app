@@ -5,7 +5,7 @@
       <div class="flex items-center gap-1">
         <h1 class="text-lg mb-0 font-bold">People</h1>
         <span class="text-2xl">&bullet;</span>
-        <p v-if="roomDevices.length > 0" class="mb-0 text-slate-600">
+        <p v-if="roomDevices.length > 0" class="mb-0 text-slate-300">
           {{roomDevices.length + ' ' + (roomDevices.length > 1 ? 'devices' : 'device')}}
         </p>
       </div>

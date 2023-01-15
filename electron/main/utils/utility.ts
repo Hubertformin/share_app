@@ -57,18 +57,16 @@ export function getHostIp(): string {
 
 export function generateRandomColor(): string {
     const COLORS = [
-        "#BA000D",
+        "#4e1edc",
         "#006978",
         "#E1980C",
         "#005B9F",
         "#673AB7",
-        "#A00037",
+        "#a6028b",
         "#00766C",
-        "#00600F",
-        "#BC5100",
-        "#283593",
-        "#C41C00",
-        "#29434e",
+        "#0c9f22",
+        "#c45f13",
+        "#3040b4",
     ];
     const randomIndex = Math.floor(Math.random() * COLORS.length);
     return COLORS[randomIndex];

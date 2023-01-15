@@ -16,7 +16,7 @@
     >
       <FileCard v-for="(file, index) in roomFiles" :file="file"/>
       <!--    empty state-->
-      <div v-if="roomFiles.length < 1" class="h-full flex items-center px-24">
+      <div v-if="roomFiles.length < 1" class="h-full flex justify-center items-center px-24">
         <a-empty>
           <template #description>
             <h3 class="text-xl font-bold">No files in this room</h3>
@@ -90,7 +90,7 @@ export default defineComponent({
       });
 
       (this as any).socket.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, JSON.stringify({files}))
-    }
+    },
   }
 })
 </script>

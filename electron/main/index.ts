@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain, screen, shell, DownloadItem} from 'electron'
+import {app, BrowserWindow, ipcMain, screen, shell, dialog} from 'electron'
 import {release} from 'node:os'
 import {join} from 'node:path';
 import * as remoteMain from '@electron/remote/main';
@@ -8,8 +8,11 @@ import {getHostIp} from "./utils/utility";
 import {download} from 'electron-dl';
 import Store from "electron-store";
 import {ConfigModel, FileModel} from "../models";
+import {DownloadManager} from "./modules/DownloadManager";
 
+Store.initRenderer();
 const settings = new Store();
+const APP_CONFIG: ConfigModel = settings.get('config') as ConfigModel;
 
 remoteMain.initialize();
 process.env.DIST_ELECTRON = join(__dirname, '..')
@@ -34,7 +37,7 @@ if (!app.requestSingleInstanceLock()) {
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-let win: BrowserWindow | null = null
+let win: BrowserWindow | null = null, downloadManager: DownloadManager;
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
@@ -80,6 +83,44 @@ async function createWindow() {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
+
+  /**
+   * Initialize download manager
+   */
+  downloadManager = new DownloadManager(win, {
+    maxDownloadInstances: 3,
+    savePath: APP_CONFIG.destinationDir
+  });
+  downloadManager.listenToDownloadEvents();
+
+  initWindowEvents();
+}
+
+function initWindowEvents() {
+  win.on('close', async (e) => {
+    e.preventDefault();
+    const downloadsCount = downloadManager.getDownloadQueue().length;
+
+    if (downloadsCount == 0) {
+      win.destroy();
+      return;
+    }
+
+    const choice = await dialog.showMessageBox(
+        win,
+        {
+          type: 'question',
+          buttons: ['Yes', 'No, hang on'],
+          title: 'Are you sure?',
+          message: `There are 4 instances of downloads running, quiting will abort all downloads`
+        }
+    );
+
+    if (choice.response === 0) {
+      await downloadManager.cancelAllDownloads();
+      win.destroy();
+    }
+  });
 }
 
 app.whenReady().then(createWindow)
@@ -124,7 +165,7 @@ ipcMain.handle('open-win', (_, arg) => {
 })
 
 
-initApp()
+initApp(settings)
     .catch(console.error)
 
 // Init server
@@ -150,65 +191,6 @@ ipcMain.handle('close-room', async (_, arg) => {
   return true;
 });
 
-interface FileDownload extends FileModel {
-  downloadItemHandler: DownloadItem;
-  url: string;
-}
-let filesInDownload: FileDownload[] = [];
-ipcMain.on('download-file', async (event, arg) => {
-  const file = JSON.parse(arg) as FileDownload;
-  // url
-  const url = `http://${file.device.machineIp}:2391/download?path=${file.device.path}&type=${file.type}`
-  console.log(url)
-  // Get config
-  const config: ConfigModel = settings.get('config') as ConfigModel;
-  await download(win, url, {
-    directory: config.destinationDir,
-    openFolderWhenDone: false,
-    overwrite: true,
-    saveAs: false,
-    onStarted: (item) => {
-      file.downloadItemHandler = item;
-      filesInDownload.push(file);
-      win.webContents.send('file-download-started', JSON.stringify({
-        fileId: file.id,
-        canResume: item.canResume()
-      }));
-    },
-    onProgress(progress) {
-      win.webContents.send('file-download-progress', JSON.stringify({
-        fileId: file.id,
-        ...progress
-      }))
-    },
-    onTotalProgress(progress) {
-      win.webContents.send('total-download-progress', JSON.stringify({
-        fileId: file.id,
-        ...progress
-      }))
-    },
-    onCompleted(data) {
-      win.webContents.send('file-download-complete', JSON.stringify({
-        fileId: file.id,
-        path: data.path
-      }))
-    },
-    onCancel(_) {
-      win.webContents.send('file-download-canceled', JSON.stringify({
-        fileId: file.id,
-      }))
-    },
-  });
-});
-
-ipcMain.on('cancel-download', async (event, arg) => {
-  const _file = JSON.parse(arg) as FileModel;
-  const file = filesInDownload.find(f => f.id === _file.id);
-  if (file) {
-    file.downloadItemHandler.cancel();
-  }
-});
-
 ipcMain.on('open-file', async (event, path) => {
   shell.openPath(path)
   shell.beep()
@@ -219,9 +201,64 @@ ipcMain.on('open-destination-folder', async (event, path) => {
   shell.openPath(config.destinationDir)
 });
 
-
+ipcMain.handle('select-dir', async (_, arg) => {
+  const {filePaths} = await dialog.showOpenDialog({ properties: ['openDirectory'] });
+  return filePaths[0];
+});
 
 
 app.on('quit', () => {
   appServer.stopServer();
 })
+
+
+// interface FileDownload extends FileModel {
+//   downloadItemHandler: DownloadItem;
+//   url: string;
+// }
+// let filesInDownload: FileDownload[] = [];
+// ipcMain.on('download-file', async (event, arg) => {
+//   const file = JSON.parse(arg) as FileDownload;
+//   // url
+//   const url = `http://${file.device.machineIp}:2391/download?path=${file.device.path}&type=${file.type}`
+//   console.log(url)
+//   // Get config
+//   const config: ConfigModel = settings.get('config') as ConfigModel;
+//   await download(win, url, {
+//     directory: config.destinationDir,
+//     openFolderWhenDone: false,
+//     overwrite: true,
+//     saveAs: false,
+//     onStarted: (item) => {
+//       file.downloadItemHandler = item;
+//       filesInDownload.push(file);
+//       win.webContents.send('file-download-started', JSON.stringify({
+//         fileId: file.id,
+//         canResume: item.canResume()
+//       }));
+//     },
+//     onProgress(progress) {
+//       win.webContents.send('file-download-progress', JSON.stringify({
+//         fileId: file.id,
+//         ...progress
+//       }))
+//     },
+//     onTotalProgress(progress) {
+//       win.webContents.send('total-download-progress', JSON.stringify({
+//         fileId: file.id,
+//         ...progress
+//       }))
+//     },
+//     onCompleted(data) {
+//       win.webContents.send('file-download-complete', JSON.stringify({
+//         fileId: file.id,
+//         path: data.path
+//       }))
+//     },
+//     onCancel(_) {
+//       win.webContents.send('file-download-canceled', JSON.stringify({
+//         fileId: file.id,
+//       }))
+//     },
+//   });
+// });

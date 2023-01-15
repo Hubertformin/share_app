@@ -5,12 +5,12 @@
         <h1 class="text-lg mb-0 font-bold">Saved Files</h1>
       </div>
       <div class="action">
-        <a-button :loading="false" @click="openDestinationFolder">
+        <a-button :loading="false" type="text" @click="openDestinationFolder">
           Open Folder
         </a-button>
       </div>
     </div>
-    <div class="body rounded-xl pt-6 px-3 pr-6 border pb-6 pt-4">
+    <div class="body rounded-xl pt-6 px-3 pr-6 border border-color-theme pb-6 pt-4">
       <div v-for="(file, index) in files"
            class="file-box cursor-pointer cursor-p ml-2 mb-5 rounded-lg px-4 flex items-center justify-between"
            @dblclick="openFile(file.downloadMeta?.path)"
@@ -70,7 +70,6 @@ export default defineComponent({
       sendMain('open-destination-folder', null)
     },
     openFile(path: string) {
-      console.log(path)
       if (!path) return;
       sendMain('open-file', path)
     }
@@ -91,7 +90,7 @@ $header-height: 50px;
 .file-box {
   position: relative;
   overflow: hidden;
-  border: 1px solid #dddddd;
+  border: 1px solid #666666;
   height: 70px;
 }
 

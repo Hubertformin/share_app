@@ -2,20 +2,22 @@
 <div class="body px-4 pt-8 h-screen flex justify-center items-center w-full">
   <div class="head text-center">
     <h1 class="text-3xl mb-1 font-bold text-white">{{activeShareRoom.name}}</h1>
+    <p class="text-medium text-lg text-slate-300 mb-3">Waiting for people to join...</p>
     <p class="font-bold">Passcode: {{activeShareRoom.passcode}}</p>
   </div>
   <div class="load">
+    <img src="../assets/icon.png" alt="">
 <!--    <div class="green-scanner"></div>-->
   </div>
 
   <div class="foot text-center">
     <a-button @click="$router.push('/share-room')">Go</a-button>
-    <p class="text-medium mb-3">Waiting for people to join...</p>
+
     <a-button class="px-24" danger type="primary" shape="round" size="large" @click="closeRoom">
       <!--        <template #icon>-->
       <!--          <v-icon name="bi-ui-checks-grid" />-->
       <!--        </template>-->
-      Stop ShareRoom
+      Close ShareRoom
     </a-button>
   </div>
 </div>
@@ -59,7 +61,7 @@ export default defineComponent({
 <style scoped lang="scss">
 $bg-color: #101c3d;
 .body {
-  background-color: $bg-color;
+  background: linear-gradient(to bottom, #10383d, #101c3d);
 }
 
 .head {
@@ -114,6 +116,15 @@ $bg-color: #101c3d;
   animation: pulse 2000ms linear infinite;
   -webkit-animation: pulse 2000ms linear infinite;
   -moz-animation: pulse 2000ms linear infinite;
+}
+
+.load img {
+  position:absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
 }
 
 .load i{

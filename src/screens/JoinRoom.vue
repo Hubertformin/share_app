@@ -18,10 +18,10 @@
                 <h2 class="title-card-title font-semibold mb-1">{{room.name}}</h2>
                 <div class="flex gap-4">
                   <p class="text-slate-400 mb-0 text-sm">
-                    <v-icon name="md-people-sharp" scale="0.9"/>&nbsp;{{room.participants.length}} People
+                    <v-icon name="md-people-sharp" scale="0.9"/>&nbsp;{{room.participants.length}} {{room.participants.length === 1 ? 'Person' : 'People'}}
                   </p>
                   <p class="text-slate-400 mb-0 text-sm">
-                    <v-icon name="md-filecopy" scale="0.7"/>&nbsp;{{room.files.length}} Files
+                    <v-icon name="md-filecopy" scale="0.7"/>&nbsp;{{room.files.length}} {{room.files.length === 1 ? 'File' : 'Files'}}
                   </p>
                 </div>
               </div>

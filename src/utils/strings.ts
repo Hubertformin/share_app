@@ -44,3 +44,7 @@ export function readableFileSize(bytes: number, si = false, dp = 1) {
 
     return bytes.toFixed(dp) + ' ' + units[u];
 }
+
+export function readableDownloadSpeed(bytes: number) {
+    return `${readableFileSize(bytes, true, 1)}/s`
+}

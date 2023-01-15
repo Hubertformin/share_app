@@ -50,6 +50,7 @@ export default defineComponent({
       });
 
       socket.connect();
+
       // when connection is established head to room
       socket.on('connect', () => {
         // got to share room home page
@@ -100,7 +101,8 @@ export default defineComponent({
             percent: 0,
             transferredBytes: 0,
             canResume: data.canResume,
-            totalBytes: 0
+            totalBytes: 0,
+            speed: 0
           }
         });
       });
@@ -113,7 +115,8 @@ export default defineComponent({
             state: DOWNLOAD_STATE.DOWNLOADING,
             percent: data.percent,
             transferredBytes: data.transferredBytes,
-            totalBytes: data.totalBytes
+            totalBytes: data.totalBytes,
+            speed: data.speed
           }
         });
       });
@@ -124,6 +127,20 @@ export default defineComponent({
           percent: data.percent,
           transferredBytes: data.transferredBytes,
           totalBytes: data.totalBytes
+        });
+      });
+
+      listenToMainEvents('file-download-building', (data) => {
+        // @ts-ignore
+        this.updateFileDownloadData({
+          id: data.fileId,
+          data: {
+            state: DOWNLOAD_STATE.DOWNLOAD_BUILDING,
+            percent: data.percent,
+            transferredBytes: 0,
+            totalBytes: 0,
+            speed: data.speed
+          }
         });
       });
 

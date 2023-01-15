@@ -1,13 +1,10 @@
 import {app} from 'electron'
-import Store from 'electron-store';
 import os from "os";
 import platform from 'systeminformation';
+import Store from 'electron-store';
 
-Store.initRenderer();
-const settings = new Store();
-
-export async function initApp() {
-    // check for user data if not set if user data does not exist
+export async function initApp(settings: Store) {
+    // check for user data if not set is user data does not exist
     const deviceInfo = settings.get('deviceInfo');
     const config = settings.get('config');
     const osName = await platform.osInfo();
