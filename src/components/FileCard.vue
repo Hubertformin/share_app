@@ -27,7 +27,7 @@
           </div>
         </div>
       </div>
-      <div class="actions pr-3">
+      <div class="actions pr-3" v-if="deviceInfo.id !== file.device.id">
 <!--            v-if="file.device.id !== deviceInfo.id" -->
         <div class="flex gap-2" v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING">
           <a-button

@@ -5,7 +5,7 @@ declare type MAIN_EVENTS =
     'close-room' |
     'file-download-progress' | 'file-download-started' |
      'file-download-complete' | 'total-download-progress' | 'file-download-building' |
-    'file-download-canceled' | 'download-file' | 'cancel-download' |
+    'file-download-canceled' | 'download-file' | 'cancel-download' | 'cancel-all-downloads' |
     'open-file' | 'open-destination-folder' | 'select-dir'
 export function fetchMain<T>(evt: MAIN_EVENTS, data: any = null): Promise<T> {
     return ipcRenderer.invoke(evt, JSON.stringify(data))

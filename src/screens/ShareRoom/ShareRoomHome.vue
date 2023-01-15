@@ -35,7 +35,7 @@
 <!--          </a-button>-->
         </template>
         <template v-else>
-          <a-button danger type="primary" shape="round">
+          <a-button danger type="primary" shape="round" @click="leaveRoom()">
             <template #icon>
               <v-icon name="ri-logout-circle-r-line" fill="white"/>
             </template>
@@ -68,7 +68,7 @@ import {mapMutations, mapState} from "vuex";
 import {DeviceModel, DOWNLOAD_STATE} from "../../models";
 import {defineComponent} from "vue";
 import {Modal} from "ant-design-vue";
-import {fetchMain} from "../../utils/ipc-render";
+import {fetchMain, sendMain} from "../../utils/ipc-render";
 
 export default defineComponent({
   components: {SwipeBottomNavigation},
@@ -129,7 +129,7 @@ export default defineComponent({
         okText: 'Close',
         cancelText: 'Cancel',
         onOk: () => {
-          // TODO: Cancel all download from this user...
+          sendMain('cancel-all-downloads');
           this.socket.disconnect();
           this.$router.push('/')
         }

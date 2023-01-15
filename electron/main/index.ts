@@ -88,8 +88,7 @@ async function createWindow() {
    * Initialize download manager
    */
   downloadManager = new DownloadManager(win, {
-    maxDownloadInstances: 3,
-    savePath: APP_CONFIG.destinationDir
+    maxDownloadInstances: 3
   });
   downloadManager.listenToDownloadEvents();
 

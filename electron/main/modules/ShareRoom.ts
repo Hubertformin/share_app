@@ -32,7 +32,6 @@ export class ShareRoom {
         // signal: 'SIGTERM',
         // Get all devices in network
         const devices = await findDevicesInNetwork();
-        console.log(devices)
 
         const rooms: any[] = [];
         // Get devices meta info by connecting to server
@@ -44,7 +43,7 @@ export class ShareRoom {
                 });
                 rooms.push({...room.data.data, hostIp: device.ip});
             } catch (e) {
-                console.log(e.response)
+                console.log('[DEVICE_RESPONSE]', e.response)
             }
         }
         return rooms;

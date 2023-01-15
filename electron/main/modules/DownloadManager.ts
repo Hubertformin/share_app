@@ -46,6 +46,10 @@ export class DownloadManager {
             const _file = JSON.parse(arg) as FileModel;
             this.cancelDownload(_file.id).catch(console.error);
         });
+
+        ipcMain.on('cancel-all-downloads', async (event, arg) => {
+            this.cancelAllDownloads().catch(console.error);
+        });
     }
 
     addDownloadToQueue(file: FileDownload, start = true) {
