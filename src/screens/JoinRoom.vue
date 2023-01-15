@@ -111,7 +111,7 @@ export default defineComponent({
     ...mapState(['activeShareRoom'])
   },
   methods: {
-    ...mapMutations(['setSocket', "setActiveShareRoom"]),
+    ...mapMutations(['setSocket', "setActiveShareRoom", "addFilesToRoom"]),
     loadRooms() {
       console.log('finding rooms');
       fetchMain<ShareRoomModel[]>('find-rooms')
@@ -150,7 +150,8 @@ export default defineComponent({
       this.isPageLoading = true;
 
       this.setActiveShareRoom(this.selectedRoom);
-
+      // Add the room files to state...
+      this.addFilesToRoom((this.selectedRoom as ShareRoomModel).files)
       // @ts-ignore
       this.$emitter.emit('init-sockets', {passcode: this.selectedRoomPasscode, route: true});
     }

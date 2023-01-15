@@ -10,10 +10,11 @@
         <div class="meta flex flex-col justify-center">
           <p class="file_name mb-0 font-bold">{{file.name}}</p>
           <div class="flex gap-2.5 items-center">
-            <div class="flex gap-3" v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING">
+            <div class="flex gap-2 items-center" v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING">
               <p class="text-slate-400">
-                {{readableDownloadSpeed(file.downloadMeta.speed)}}&nbsp;<span>-</span>
+                Downloading {{readableDownloadSpeed(file.downloadMeta.speed)}}
               </p>
+              <p class="">-</p>
               <p class="file_size_downloading text-slate-400 mb-0">
                 {{readableFileSize(file.downloadMeta.transferredBytes, true)}} / {{readableFileSize(file.downloadMeta.totalBytes, true)}}
               </p>
