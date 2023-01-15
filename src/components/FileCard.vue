@@ -11,18 +11,18 @@
           <p class="file_name mb-0 font-bold">{{file.name}}</p>
           <div class="flex gap-2.5 items-center">
             <div class="flex gap-2 items-center" v-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOADING">
-              <p class="text-slate-400">
+              <p class="text-slate-400 text-sm">
                 Downloading {{readableDownloadSpeed(file.downloadMeta.speed)}}
               </p>
               <p class="">-</p>
-              <p class="file_size_downloading text-slate-400 mb-0">
+              <p class="file_size_downloading text-sm text-slate-400 mb-0">
                 {{readableFileSize(file.downloadMeta.transferredBytes, true)}} / {{readableFileSize(file.downloadMeta.totalBytes, true)}}
               </p>
             </div>
-            <p v-else-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOAD_BUILDING" class="file_size text-slate-400 mb-0">
+            <p v-else-if="file.downloadMeta.state === DOWNLOAD_STATE.DOWNLOAD_BUILDING" class="file_size text-sm text-slate-400 mb-0">
               Building..
             </p>
-            <p v-else class="file_size text-slate-400 mb-0">
+            <p v-else class="file_size text-sm text-slate-400 mb-0">
               {{readableFileSize(file.size, true)}}
             </p>
           </div>
