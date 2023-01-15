@@ -20,11 +20,11 @@ export class ShareRoom {
         this._room = null;
     }
 
-    get isRoomActive(): boolean {
+    isRoomActive(): boolean {
         return !!this._room
     }
 
-    get room(): ShareRoomModel {
+    getRoom(): ShareRoomModel {
         return this._room;
     }
 
@@ -51,7 +51,7 @@ export class ShareRoom {
 
     async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {
         // If rome already exist, return room
-        if (this.isRoomActive) return this._room;
+        if (this.isRoomActive()) return this._room;
         // else create new room
         const deviceInfo: DeviceModel = settings.get('deviceInfo') as DeviceModel;
         const config: ConfigModel = settings.get('config') as ConfigModel;
@@ -70,7 +70,7 @@ export class ShareRoom {
     }
 
     addToRoom(participant: DeviceModel) {
-        if (!this.isRoomActive) {
+        if (!this.isRoomActive()) {
             throw new Error('[RM_INACTIVE] There is no active room')
         }
         // Add participant

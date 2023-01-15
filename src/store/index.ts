@@ -62,6 +62,11 @@ const store = createStore({
         updateTotalDownloadData(state, payload) {
             Object.assign(state.totalDownloads, payload)
         },
+        clearRoomData(state, payload) {
+            state.activeShareRoom = null;
+            state.roomFiles = [];
+            state.roomDevices = [];
+        },
         addDevicesToRoom(state, payload: DeviceModel[]) {
             state.roomDevices = [...payload]
         },

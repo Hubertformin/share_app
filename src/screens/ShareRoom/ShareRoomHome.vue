@@ -110,7 +110,7 @@ export default defineComponent({
     ...mapState(['socket', 'activeShareRoom'])
   },
   methods: {
-    ...mapMutations(['setSocket', 'addFilesToRoom', 'addDevicesToRoom']),
+    ...mapMutations(['setSocket', 'addFilesToRoom', 'addDevicesToRoom', 'clearRoomData']),
     closeRoom() {
       Modal.confirm({
         title: 'Are you sure you want to close this room?',
@@ -131,7 +131,7 @@ export default defineComponent({
         onOk: () => {
           sendMain('cancel-all-downloads');
           this.socket.disconnect();
-          this.$router.push('/')
+          this.$router.push('/').then(() => this.clearRoomData())
         }
       });
     }

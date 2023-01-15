@@ -29,7 +29,8 @@ export default defineComponent({
         'updateTotalDownloadData',
         'addFilesToRoom',
         'addDevicesToRoom',
-        'setSocket'
+        'setSocket',
+        'clearRoomData'
     ]),
     /**
      * Initialize socket
@@ -55,12 +56,23 @@ export default defineComponent({
         if (route) this.$router.push('/share-room');
       });
 
-      socket.on('error', (e) => {
-        console.error(e)
+      socket.on('connect_error', (e) => {
+        console.log(e)
+        // this.$router.push('/').then(() => this.clearRoomData())
         notification.warn({
-          message: `Unable to join room`,
+          message: `Unable to connect to ${this.activeShareRoom.name}`,
           description: `
-          Unable to join room. Try again. If problem persist, restart application
+          Unable to connect to ${this.activeShareRoom.name}'s room. Try again. If problem persist, restart application.
+          `
+        })
+      });
+
+      socket.on('disconnect', (e) => {
+        this.$router.push('/').then(() => this.clearRoomData())
+        notification.info({
+          message: `${this.activeShareRoom.name}'s room was terminated`,
+          description: `
+          ${this.activeShareRoom.name}'s was terminated by owner, You can connect to another room.
           `
         })
       });

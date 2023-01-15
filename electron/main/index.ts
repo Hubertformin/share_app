@@ -176,7 +176,7 @@ ipcMain.handle('get-ip', async (_, arg) => {
 })
 
 ipcMain.handle('find-rooms', async (_, arg) => {
-  return await appServer.shareRoom.findRooms();
+  return await appServer.getShareRoom().findRooms();
 })
 
 ipcMain.handle('create-room', async (_, arg) => {

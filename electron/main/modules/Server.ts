@@ -36,11 +36,11 @@ export class AppServer {
         this.initConnectionListener();
     }
 
-    get HttpServer(): Server {
+    getHttpServer(): Server {
         return this._httpServer;
     }
 
-    get shareRoom(): ShareRoom {
+    getShareRoom(): ShareRoom {
         return this._shareRoom;
     }
 
@@ -52,18 +52,18 @@ export class AppServer {
         // middle to authenticate user
         this.io.use((socket, next) => {
             try {
-                if (!this._shareRoom.isRoomActive) {
+                if (!this._shareRoom.isRoomActive()) {
                     next(new Error("NO_ACTIVE_ROOM"));
                     return;
                 }
                 // if room is full reject
-                if (this._shareRoom.room.participants.length >= this._shareRoom.room.maxParticipants) {
+                if (this._shareRoom.getRoom().participants.length >= this._shareRoom.getRoom().maxParticipants) {
                     next(new Error('ROOM_FULL'));
                     return;
                 }
                 // If passcode is correct
                 if (socket.handshake.auth && socket.handshake.auth.passcode) {
-                    if (socket.handshake.auth.passcode.toString() != this.shareRoom.room.passcode) {
+                    if (socket.handshake.auth.passcode.toString() != this.getShareRoom().getRoom().passcode) {
                         next(new Error('AUTH_ERROR'));
                         return;
                     }
@@ -84,20 +84,20 @@ export class AppServer {
              * It is possible that the person was disconnected from the socket and is still in
              * the participants array..
              */
-            if (!this._shareRoom.room.participants.find(p => p.id == device.id)) {
+            if (!this._shareRoom.getRoom().participants.find(p => p.id == device.id)) {
                 // add person to devices list
                 this._shareRoom.addToRoom(device);
                 // emit person added event
-                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.getRoom().participants));
             }
             // Add connection room
-            socket.join(this._shareRoom.room.name)
+            socket.join(this._shareRoom.getRoom().name)
             // Start room events for files, devices etc
             this.initRoomListeners(socket);
             // on disconnection
             socket.on("disconnect", (reason) => {
                 this._shareRoom.removeParticipant(device.id);
-                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.room.participants));
+                this.io.emit(SHARE_ROOM_EVENTS.ON_DEVICES_CHANGE, JSON.stringify(this._shareRoom.getRoom().participants));
             });
         })
     }
@@ -105,17 +105,17 @@ export class AppServer {
     initRoutes() {
         // get Share room info
         this._expressApp.use((req, res, next) => {
-            if (!req.path.toString().startsWith('/download') && !this._shareRoom.isRoomActive) {
+            if (!req.path.toString().startsWith('/download') && !this._shareRoom.isRoomActive()) {
                 return res.status(405).json({code: 'NO_ACTIVE_ROOM'})
             }
             next();
         });
         this._expressApp.get('/share-room', (req, res) => {
-            if (!this._shareRoom.isRoomActive) {
+            if (!this._shareRoom.isRoomActive()) {
                 return res.status(405).json({code: 'NO_ACTIVE_ROOM'})
             }
 
-            res.status(200).json({data: this._shareRoom.room, message: 'Room fetched'})
+            res.status(200).json({data: this._shareRoom.getRoom(), message: 'Room fetched'})
         });
         // Download file
         this._expressApp.get('/download/', async (req, res, next) => {
@@ -145,7 +145,7 @@ export class AppServer {
             // Only add files that are not in the room
             files = files
                 .filter(file => {
-                    const exist = this._shareRoom.room.files.findIndex(rf => {
+                    const exist = this._shareRoom.getRoom().files.findIndex(rf => {
                         return rf.device.id == file.device.id && rf.device.path === file.device.path
                     });
                     return exist < 0;
@@ -153,19 +153,19 @@ export class AppServer {
                 .map(file => {
                     // Add Ids and shared Date to files
                     return {
-                        id: generateUID('doc', (this._shareRoom.room.files.length + 1).toString()),
+                        id: generateUID('doc', (this._shareRoom.getRoom().files.length + 1).toString()),
                         sharedDate: (new Date()).toISOString(),
                         ...file
                     }
                 });
             // Add files to room data
-            this._shareRoom.room.files = [...files, ...this._shareRoom.room.files]
+            this._shareRoom.getRoom().files = [...files, ...this._shareRoom.getRoom().files]
             this.io.emit(SHARE_ROOM_EVENTS.ON_FILE_ADD, files)
         })
     }
 
     async createRoom(name: string, maxParticipants = null): Promise<ShareRoomModel> {
-        if (this._shareRoom.isRoomActive) return this._shareRoom.room;
+        if (this._shareRoom.isRoomActive()) return this._shareRoom.getRoom();
         return this._shareRoom.createRoom(name, maxParticipants)
     }
 
