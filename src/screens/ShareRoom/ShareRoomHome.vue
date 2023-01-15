@@ -126,7 +126,7 @@ export default defineComponent({
       Modal.confirm({
         title: 'Are you sure you want to leave this room?',
         content: 'Leaving this room will terminate all current downloads',
-        okText: 'Close',
+        okText: 'Leave',
         cancelText: 'Cancel',
         onOk: () => {
           sendMain('cancel-all-downloads');

@@ -109,9 +109,9 @@ function initWindowEvents() {
         win,
         {
           type: 'question',
-          buttons: ['Yes', 'No, hang on'],
+          buttons: ['Yes', 'No, Wait'],
           title: 'Are you sure?',
-          message: `There are 4 instances of downloads running, quiting will abort all downloads`
+          message: `There are ${downloadsCount} ${downloadsCount == 1 ? 'file' : 'files'}  downloading, quiting will abort all downloads in progress`
         }
     );
 
