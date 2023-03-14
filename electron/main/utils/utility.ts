@@ -4,7 +4,7 @@ import {networkInterfaces} from "os";
 
 const uid = new ShortUniqueId({length: 24});
 
-const passcode = new ShortUniqueId({length: 6});
+const passcode = new ShortUniqueId({length: 4});
 
 export function generateUID(prefix: string, suffix: string = ''): string {
     return `${prefix}_${uid()}_${suffix}`;
