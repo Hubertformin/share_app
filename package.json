@@ -50,7 +50,7 @@
     "easydl": "^1.0.3",
     "electron-dl": "^3.5.0",
     "electron-store": "^8.1.0",
-    "execa": "^6.1.0",
+    "execa": "^7.1.1",
     "express": "^4.18.2",
     "file-icons-js": "websemantics/file-icons-js",
     "local-devices": "^4.0.0",
